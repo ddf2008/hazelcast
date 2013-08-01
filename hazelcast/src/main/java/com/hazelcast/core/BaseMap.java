@@ -27,7 +27,7 @@ package com.hazelcast.core;
  * @see TransactionalMap
  *
  */
-public interface BaseMap<K, V> extends DistributedObject {
+public interface BaseMap<K, V> extends DistributedObject<String> {
 
     /**
      * Returns {@code true} if this map contains an entry for the specified

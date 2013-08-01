@@ -1,14 +1,19 @@
 package com.hazelcast.core;
 
-import java.io.Serializable;
+import com.hazelcast.nio.ObjectDataInput;
+import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.DataSerializable;
 
-/**
- * todo: class also needs to implement DataSerializable + needs to be registered as one of the default serializers.
- */
-public final class Id implements PartitionAware, Serializable {
+import java.io.IOException;
 
-    private final String name;
-    private final Object partitionKey;
+public final class Id implements PartitionAware, DataSerializable {
+
+    private String name;
+    private Object partitionKey;
+
+    public Id() {
+        // we can eliminate empty ctor by making it package private if Id class is identified DS.
+    }
 
     /**
      * Creates a new Id for a {@link DistributedObject}. It will use the name as partition-key.
@@ -87,5 +92,23 @@ public final class Id implements PartitionAware, Serializable {
                 "name='" + name + '\'' +
                 ", partitionKey=" + getPartitionKey() +
                 ']';
+    }
+
+    @Override
+    public void writeData(ObjectDataOutput out) throws IOException {
+        out.writeUTF(name);
+        final boolean hasPK = partitionKey != null;
+        out.writeBoolean(hasPK);
+        if (hasPK) {
+            out.writeObject(partitionKey);
+        }
+    }
+
+    @Override
+    public void readData(ObjectDataInput in) throws IOException {
+        name = in.readUTF();
+        if (in.readBoolean()) {
+            partitionKey = in.readObject();
+        }
     }
 }

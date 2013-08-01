@@ -19,6 +19,7 @@ package com.hazelcast.queue.proxy;
 import com.hazelcast.config.ItemListenerConfig;
 import com.hazelcast.config.QueueConfig;
 import com.hazelcast.core.HazelcastInstanceAware;
+import com.hazelcast.core.Id;
 import com.hazelcast.core.ItemListener;
 import com.hazelcast.nio.ClassLoaderUtil;
 import com.hazelcast.nio.serialization.Data;
@@ -38,17 +39,17 @@ import java.util.concurrent.Future;
  * Date: 11/14/12
  * Time: 12:47 AM
  */
-abstract class QueueProxySupport extends AbstractDistributedObject<QueueService> {
+abstract class QueueProxySupport extends AbstractDistributedObject<Id, QueueService> {
 
-    final String name;
+    final Id id;
     final int partitionId;
     final QueueConfig config;
 
-    QueueProxySupport(final String name, final QueueService queueService, NodeEngine nodeEngine) {
+    QueueProxySupport(final Id id, final QueueService queueService, NodeEngine nodeEngine) {
         super(nodeEngine, queueService);
-        this.name = name;
-        this.partitionId = nodeEngine.getPartitionService().getPartitionId(nodeEngine.toData(name));
-        this.config = nodeEngine.getConfig().getQueueConfig(name);
+        this.id = id;
+        this.partitionId = nodeEngine.getPartitionService().getPartitionId(id);
+        this.config = nodeEngine.getConfig().getQueueConfig(id.getName());
         initializeListeners(nodeEngine);
     }
 
@@ -74,7 +75,7 @@ abstract class QueueProxySupport extends AbstractDistributedObject<QueueService>
 
     boolean offerInternal(Data data, long timeout) throws InterruptedException {
         throwExceptionIfNull(data);
-        OfferOperation operation = new OfferOperation(name, timeout, data);
+        OfferOperation operation = new OfferOperation(id.getName(), timeout, data);
         final NodeEngine nodeEngine = getNodeEngine();
         try {
             Invocation inv = nodeEngine.getOperationService().createInvocationBuilder(QueueService.SERVICE_NAME, operation, getPartitionId()).build();
@@ -86,22 +87,22 @@ abstract class QueueProxySupport extends AbstractDistributedObject<QueueService>
     }
 
     public int size() {
-        SizeOperation operation = new SizeOperation(name);
+        SizeOperation operation = new SizeOperation(id.getName());
         return (Integer) invoke(operation);
     }
 
     public void clear() {
-        ClearOperation operation = new ClearOperation(name);
+        ClearOperation operation = new ClearOperation(id.getName());
         invoke(operation);
     }
 
     Object peekInternal() {
-        PeekOperation operation = new PeekOperation(name);
+        PeekOperation operation = new PeekOperation(id.getName());
         return invokeData(operation);
     }
 
     Object pollInternal(long timeout) throws InterruptedException {
-        PollOperation operation = new PollOperation(name, timeout);
+        PollOperation operation = new PollOperation(id.getName(), timeout);
         final NodeEngine nodeEngine = getNodeEngine();
         try {
             Invocation inv = nodeEngine.getOperationService().createInvocationBuilder(QueueService.SERVICE_NAME, operation, getPartitionId()).build();
@@ -114,37 +115,36 @@ abstract class QueueProxySupport extends AbstractDistributedObject<QueueService>
 
     boolean removeInternal(Data data) {
         throwExceptionIfNull(data);
-        RemoveOperation operation = new RemoveOperation(name, data);
+        RemoveOperation operation = new RemoveOperation(id.getName(), data);
         return (Boolean) invoke(operation);
     }
 
     boolean containsInternal(Collection<Data> dataList) {
-        ContainsOperation operation = new ContainsOperation(name, dataList);
+        ContainsOperation operation = new ContainsOperation(id.getName(), dataList);
         return (Boolean) invoke(operation);
     }
 
     List<Data> listInternal() {
-        IteratorOperation operation = new IteratorOperation(name);
+        IteratorOperation operation = new IteratorOperation(id.getName());
         SerializableCollection collectionContainer = invoke(operation);
         return (List<Data>) collectionContainer.getCollection();
     }
 
     Collection<Data> drainInternal(int maxSize) {
-        DrainOperation operation = new DrainOperation(name, maxSize);
+        DrainOperation operation = new DrainOperation(id.getName(), maxSize);
         SerializableCollection collectionContainer = invoke(operation);
         return collectionContainer.getCollection();
     }
 
     boolean addAllInternal(Collection<Data> dataList) {
-        AddAllOperation operation = new AddAllOperation(name, dataList);
+        AddAllOperation operation = new AddAllOperation(id.getName(), dataList);
         return (Boolean) invoke(operation);
     }
 
     boolean compareAndRemove(Collection<Data> dataList, boolean retain) {
-        CompareAndRemoveOperation operation = new CompareAndRemoveOperation(name, dataList, retain);
+        CompareAndRemoveOperation operation = new CompareAndRemoveOperation(id.getName(), dataList, retain);
         return (Boolean) invoke(operation);
     }
-
 
     private int getPartitionId() {
         return partitionId;
@@ -182,19 +182,19 @@ abstract class QueueProxySupport extends AbstractDistributedObject<QueueService>
         return QueueService.SERVICE_NAME;
     }
 
-    public final Object getId() {
-        return name;
+    public final Id getId() {
+        return id;
     }
 
     public final String getName() {
-        return name;
+        return id.getName();
     }
 
     public String addItemListener(ItemListener listener, boolean includeValue) {
-        return getService().addItemListener(name, listener, includeValue);
+        return getService().addItemListener(id.getName(), listener, includeValue);
     }
 
     public boolean removeItemListener(String registrationId) {
-        return getService().removeItemListener(name, registrationId);
+        return getService().removeItemListener(id.getName(), registrationId);
     }
 }

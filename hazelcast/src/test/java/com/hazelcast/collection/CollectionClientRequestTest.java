@@ -19,7 +19,6 @@ package com.hazelcast.collection;
 
 import com.hazelcast.client.ClientTestSupport;
 import com.hazelcast.client.SimpleClient;
-import com.hazelcast.collection.list.ObjectListProxy;
 import com.hazelcast.collection.operations.client.*;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.IList;
@@ -48,8 +47,8 @@ import static org.junit.Assert.*;
 public class CollectionClientRequestTest extends ClientTestSupport {
 
     static final String name = "test";
-    static final CollectionProxyId mmProxyId = new CollectionProxyId(name, null, CollectionProxyType.MULTI_MAP);
-    static final CollectionProxyId listProxyId = new CollectionProxyId(ObjectListProxy.COLLECTION_LIST_NAME, name, CollectionProxyType.LIST);
+    static final CollectionProxyId mmProxyId = CollectionProxyId.newMultiMapProxyId(name);
+    static final CollectionProxyId listProxyId = CollectionProxyId.newListProxyId(name, null);
     static final SerializationService ss = new SerializationServiceBuilder().build();
     static final Data dataKey = ss.toData(name);
 

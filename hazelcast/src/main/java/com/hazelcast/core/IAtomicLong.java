@@ -20,7 +20,7 @@ package com.hazelcast.core;
  * IAtomicLong is a redundant and highly available distributed implementation of
  * {@link java.util.concurrent.atomic.AtomicLong java.util.concurrent.atomic.AtomicLong}.
  */
-public interface IAtomicLong extends DistributedObject {
+public interface IAtomicLong extends DistributedObject<Id> {
     /**
      * Returns the name of this IAtomicLong instance.
      *

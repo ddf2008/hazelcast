@@ -17,6 +17,7 @@
 package com.hazelcast.topic;
 
 import com.hazelcast.config.TopicConfig;
+import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.Message;
 import com.hazelcast.core.MessageListener;
 import com.hazelcast.monitor.impl.LocalTopicStatsImpl;
@@ -38,7 +39,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Date: 12/26/12
  * Time: 1:50 PM
  */
-public class TopicService implements ManagedService, RemoteService, EventPublishingService {
+public class TopicService implements ManagedService, RemoteService<String>, EventPublishingService {
 
     public static final String SERVICE_NAME = "hz:impl:topicService";
     private final Lock[] orderingLocks = new Lock[1000];
@@ -72,20 +73,16 @@ public class TopicService implements ManagedService, RemoteService, EventPublish
         return orderingLocks[hash != Integer.MIN_VALUE ? (Math.abs(hash) % orderingLocks.length) : 0];
     }
 
-    public TopicProxy createDistributedObject(Object objectId) {
-        final String name = String.valueOf(objectId);
-        TopicProxy proxy;
+    public DistributedObject createDistributedObject(String name) {
         TopicConfig topicConfig = nodeEngine.getConfig().getTopicConfig(name);
         if (topicConfig.isGlobalOrderingEnabled())
-            proxy = new TotalOrderedTopicProxy(name, nodeEngine, this);
+            return new TotalOrderedTopicProxy(name, nodeEngine, this);
         else
-            proxy = new TopicProxy(name, nodeEngine, this);
-        return proxy;
+            return new TopicProxy(name, nodeEngine, this);
     }
 
-    public void destroyDistributedObject(Object objectId) {
-        statsMap.remove(String.valueOf(objectId));
-
+    public void destroyDistributedObject(String objectId) {
+        statsMap.remove(objectId);
     }
 
     public void dispatchEvent(Object event, Object listener) {

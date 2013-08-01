@@ -25,7 +25,7 @@ import java.util.concurrent.locks.Lock;
  *
  * @see Lock
  */
-public interface ILock extends Lock, DistributedObject {
+public interface ILock extends Lock, DistributedObject<Object> {
 
     /**
      * Returns the lock object, the key for this lock instance.

@@ -41,7 +41,7 @@ import java.util.concurrent.Future;
 /**
  * @author ali 3/29/13
  */
-public abstract class TransactionalMultiMapProxySupport extends AbstractDistributedObject<CollectionService> implements TransactionalObject {
+public abstract class TransactionalMultiMapProxySupport<ID> extends AbstractDistributedObject<ID, CollectionService> implements TransactionalObject<ID> {
 
     protected final CollectionProxyId proxyId;
     protected final TransactionSupport tx;
@@ -234,10 +234,6 @@ public abstract class TransactionalMultiMapProxySupport extends AbstractDistribu
 
     private TransactionLogKey getTxLogKey(Data key) {
         return new TransactionLogKey(proxyId, key);
-    }
-
-    public Object getId() {
-        return proxyId;
     }
 
     public String getName() {

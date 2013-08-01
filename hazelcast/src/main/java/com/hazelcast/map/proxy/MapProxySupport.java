@@ -51,7 +51,7 @@ import static com.hazelcast.map.MapService.SERVICE_NAME;
 /**
  * @author enesakar 1/17/13
  */
-abstract class MapProxySupport extends AbstractDistributedObject<MapService> {
+abstract class MapProxySupport extends AbstractDistributedObject<String, MapService> {
 
     protected static final String NULL_KEY_IS_NOT_ALLOWED = "Null key is not allowed!";
     protected static final String NULL_VALUE_IS_NOT_ALLOWED = "Null value is not allowed!";
@@ -730,7 +730,7 @@ abstract class MapProxySupport extends AbstractDistributedObject<MapService> {
         return timeunit != null ? timeunit.toMillis(time) : time;
     }
 
-    public final Object getId() {
+    public final String getId() {
         return name;
     }
 

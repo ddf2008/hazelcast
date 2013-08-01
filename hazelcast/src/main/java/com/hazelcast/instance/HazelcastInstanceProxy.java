@@ -180,6 +180,45 @@ public final class HazelcastInstanceProxy implements HazelcastInstance {
         return "HazelcastInstance {NOT ACTIVE}";
     }
 
+    @Override
+    public <E> IQueue<E> getQueue(Id id) {
+        return getOriginal().getQueue(id);
+    }
+
+    @Override
+    public <E> ISet<E> getSet(Id id) {
+        return getOriginal().getSet(id);
+    }
+
+    @Override
+    public <E> IList<E> getList(Id id) {
+        return getOriginal().getList(id);
+    }
+
+    @Override
+    public ILock getLock(Id id) {
+        return getOriginal().getLock(id);
+    }
+
+    @Override
+    public IAtomicLong getAtomicLong(Id id) {
+        return getOriginal().getAtomicLong(id);
+    }
+
+    @Override
+    public IdGenerator getIdGenerator(Id id) {
+        return getOriginal().getIdGenerator(id);
+    }
+
+    @Override
+    public ICountDownLatch getCountDownLatch(Id id) {
+        return getOriginal().getCountDownLatch(id);
+    }
+
+    @Override
+    public ISemaphore getSemaphore(Id id) {
+        return getOriginal().getSemaphore(id);
+    }
 }
 
 

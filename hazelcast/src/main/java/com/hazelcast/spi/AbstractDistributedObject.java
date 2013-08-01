@@ -22,7 +22,7 @@ import com.hazelcast.core.HazelcastInstanceNotActiveException;
 /**
  * @author mdogan 1/14/13
  */
-public abstract class AbstractDistributedObject<S extends RemoteService> implements DistributedObject {
+public abstract class AbstractDistributedObject<ID, S extends RemoteService> implements DistributedObject<ID> {
 
     private volatile NodeEngine nodeEngine;
     private volatile S service;

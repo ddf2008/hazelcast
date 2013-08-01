@@ -33,14 +33,14 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author ali 5/19/13
  */
-public final class ClientQueueProxy<E> extends ClientProxy implements IQueue<E>{
+public final class ClientQueueProxy<E> extends ClientProxy<Id> implements IQueue<E>{
 
     private final String name;
     private Data key;
 
-    public ClientQueueProxy(String serviceName, String name) {
-        super(serviceName, name);
-        this.name = name;
+    public ClientQueueProxy(String serviceName, Id id) {
+        super(serviceName, id);
+        this.name = id.getName();
     }
 
     public String addItemListener(final ItemListener<E> listener, final boolean includeValue) {
@@ -259,9 +259,9 @@ public final class ClientQueueProxy<E> extends ClientProxy implements IQueue<E>{
         }
     }
 
-    private Data getKey(){
-        if (key == null){
-            key = getContext().getSerializationService().toData(name);
+    private Data getKey() {
+        if (key == null) {
+            key = getContext().getSerializationService().toData(getId());
         }
         return key;
     }

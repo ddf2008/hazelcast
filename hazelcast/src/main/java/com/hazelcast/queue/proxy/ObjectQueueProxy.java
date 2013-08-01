@@ -16,6 +16,7 @@
 
 package com.hazelcast.queue.proxy;
 
+import com.hazelcast.core.Id;
 import com.hazelcast.monitor.LocalQueueStats;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.queue.QueueService;
@@ -31,12 +32,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class ObjectQueueProxy<E> extends QueueProxySupport implements QueueProxy<E> {
 
-    public ObjectQueueProxy(String name, QueueService queueService, NodeEngine nodeEngine) {
-        super(name, queueService, nodeEngine);
+    public ObjectQueueProxy(Id id, QueueService queueService, NodeEngine nodeEngine) {
+        super(id, queueService, nodeEngine);
     }
 
     public LocalQueueStats getLocalQueueStats() {
-        return getService().createLocalQueueStats(name, partitionId);
+        return getService().createLocalQueueStats(getName(), partitionId);
     }
 
     public boolean add(E e) {
@@ -192,7 +193,7 @@ public class ObjectQueueProxy<E> extends QueueProxySupport implements QueueProxy
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("IQueue");
-        sb.append("{name='").append(name).append('\'');
+        sb.append("{name='").append(getName()).append('\'');
         sb.append('}');
         return sb.toString();
     }

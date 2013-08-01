@@ -38,12 +38,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author ali 5/19/13
  */
-public class ClientMultiMapProxy<K, V> extends ClientProxy implements MultiMap<K, V> {
+public class ClientMultiMapProxy<K, V> extends ClientProxy<String> implements MultiMap<K, V> {
 
     final CollectionProxyId proxyId;
 
     public ClientMultiMapProxy(String serviceName, CollectionProxyId objectId) {
-        super(serviceName, objectId);
+        super(serviceName, objectId.getName());
         proxyId = objectId;
     }
 

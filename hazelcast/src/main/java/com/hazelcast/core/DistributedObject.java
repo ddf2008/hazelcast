@@ -29,14 +29,14 @@ package com.hazelcast.core;
  * @see TransactionalQueue
  * @see TransactionalMultiMap
  */
-public interface DistributedObject {
+public interface DistributedObject<ID> {
 
     /**
      * Returns the unique id for this object.
      *
      * @return id the of this instance
      */
-    Object getId();
+    ID getId();
 
     /**
      * @return the name for this object.

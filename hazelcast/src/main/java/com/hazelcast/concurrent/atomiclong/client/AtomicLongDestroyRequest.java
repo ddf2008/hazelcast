@@ -20,6 +20,7 @@ import com.hazelcast.client.CallableClientRequest;
 import com.hazelcast.client.RetryableRequest;
 import com.hazelcast.concurrent.atomiclong.AtomicLongPortableHook;
 import com.hazelcast.concurrent.atomiclong.AtomicLongService;
+import com.hazelcast.core.Id;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
@@ -42,7 +43,7 @@ public class AtomicLongDestroyRequest extends CallableClientRequest implements P
 
     public Object call() throws Exception {
         final AtomicLongService service = getService();
-        service.destroyDistributedObject(name);
+        service.destroyDistributedObject(new Id(name));
         return null;
     }
 

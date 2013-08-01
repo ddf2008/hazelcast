@@ -38,12 +38,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
 
 /**
  * @author mdogan 5/17/13
  */
-public final class ClientMapProxy<K, V> extends ClientProxy implements IMap<K, V> {
+public final class ClientMapProxy<K, V> extends ClientProxy<String> implements IMap<K, V> {
 
     private final String name;
     private volatile ClientNearCache nearCache;

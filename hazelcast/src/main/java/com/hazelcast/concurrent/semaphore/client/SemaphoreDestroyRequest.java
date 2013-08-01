@@ -20,6 +20,7 @@ import com.hazelcast.client.CallableClientRequest;
 import com.hazelcast.client.RetryableRequest;
 import com.hazelcast.concurrent.semaphore.SemaphorePortableHook;
 import com.hazelcast.concurrent.semaphore.SemaphoreService;
+import com.hazelcast.core.Id;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
@@ -42,7 +43,7 @@ public class SemaphoreDestroyRequest extends CallableClientRequest implements Po
 
     public Object call() throws Exception {
         SemaphoreService service = getService();
-        service.destroyDistributedObject(name);
+        service.destroyDistributedObject(new Id(name));
         return null;
     }
 

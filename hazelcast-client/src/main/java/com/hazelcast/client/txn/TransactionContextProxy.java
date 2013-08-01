@@ -18,13 +18,10 @@ package com.hazelcast.client.txn;
 
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.connection.Connection;
-import com.hazelcast.client.spi.ClientProxy;
 import com.hazelcast.client.txn.proxy.*;
 import com.hazelcast.collection.CollectionProxyId;
 import com.hazelcast.collection.CollectionProxyType;
 import com.hazelcast.collection.CollectionService;
-import com.hazelcast.collection.list.ObjectListProxy;
-import com.hazelcast.collection.set.ObjectSetProxy;
 import com.hazelcast.core.*;
 import com.hazelcast.map.MapService;
 import com.hazelcast.queue.QueueService;
@@ -76,22 +73,43 @@ public class TransactionContextProxy implements TransactionContext {
     }
 
     public <E> TransactionalQueue<E> getQueue(String name) {
-        return getTransactionalObject(QueueService.SERVICE_NAME, name);
+        return getQueue(new Id(name));
+    }
+
+    @Override
+    public <E> TransactionalQueue<E> getQueue(Id id) {
+        return getTransactionalObject(QueueService.SERVICE_NAME, id);
     }
 
     public <K, V> TransactionalMultiMap<K, V> getMultiMap(String name) {
-        return getTransactionalObject(CollectionService.SERVICE_NAME, new CollectionProxyId(name, null, CollectionProxyType.MULTI_MAP));
+        return getTransactionalObject(CollectionService.SERVICE_NAME, CollectionProxyId.newMultiMapProxyId(name));
     }
 
     public <E> TransactionalList<E> getList(String name) {
-        return getTransactionalObject(CollectionService.SERVICE_NAME, new CollectionProxyId(ObjectListProxy.COLLECTION_LIST_NAME, name, CollectionProxyType.LIST));
+        return getList(new Id(name));
+    }
+
+    @Override
+    public <E> TransactionalList<E> getList(Id id) {
+        return getTransactionalObject(CollectionService.SERVICE_NAME, CollectionProxyId.newListProxyId(id.getName(), id.getPartitionKey()));
     }
 
     public <E> TransactionalSet<E> getSet(String name) {
-        return getTransactionalObject(CollectionService.SERVICE_NAME, new CollectionProxyId(ObjectSetProxy.COLLECTION_SET_NAME, name, CollectionProxyType.SET));
+        return getSet(new Id(name));
+    }
+
+    @Override
+    public <E> TransactionalSet<E> getSet(Id id) {
+        return getTransactionalObject(CollectionService.SERVICE_NAME, CollectionProxyId.newSetProxyId(id.getName(), id.getPartitionKey()));
     }
 
     public <T extends TransactionalObject> T getTransactionalObject(String serviceName, Object id) {
+        if (serviceName == null) {
+            throw new NullPointerException("Retrieving a transactional object with a null service name is not allowed!");
+        }
+        if (id == null) {
+            throw new NullPointerException("Retrieving a transactional object with a null id is not allowed!");
+        }
         if (transaction.getState() != Transaction.State.ACTIVE) {
             throw new TransactionNotActiveException("No transaction is found while accessing " +
                     "transactional object -> " + serviceName + "[" + id + "]!");
@@ -100,7 +118,7 @@ public class TransactionContextProxy implements TransactionContext {
         TransactionalObject obj = txnObjectMap.get(key);
         if (obj == null) {
             if (serviceName.equals(QueueService.SERVICE_NAME)) {
-                obj = new ClientTxnQueueProxy(String.valueOf(id), this);
+                obj = new ClientTxnQueueProxy((Id) id, this);
             } else if (serviceName.equals(MapService.SERVICE_NAME)) {
                 obj = new ClientTxnMapProxy(String.valueOf(id), this);
             } else if (serviceName.equals(CollectionService.SERVICE_NAME)) {
@@ -112,11 +130,12 @@ public class TransactionContextProxy implements TransactionContext {
                 } else if (proxyId.getType().equals(CollectionProxyType.SET)) {
                     obj = new ClientTxnSetProxy(proxyId, this);
                 }
-            } else {
+            }
+            if (obj == null) {
                 throw new IllegalArgumentException("Service[" + serviceName + "] is not transactional!");
             }
+            txnObjectMap.put(key, obj);
         }
-
         return (T) obj;
     }
 
@@ -126,9 +145,6 @@ public class TransactionContextProxy implements TransactionContext {
 
     public HazelcastClient getClient() {
         return client;
-    }
-
-    private void initProxy(ClientProxy proxy) {
     }
 
     private Connection connect() {

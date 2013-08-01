@@ -16,6 +16,9 @@
 
 package com.hazelcast.topic.proxy;
 
+import com.hazelcast.core.ITopic;
+import com.hazelcast.core.MessageListener;
+import com.hazelcast.monitor.LocalTopicStats;
 import com.hazelcast.spi.Invocation;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.topic.PublishOperation;
@@ -29,7 +32,7 @@ import java.util.concurrent.Future;
  * Date: 12/31/12
  * Time: 12:08 PM
  */
-public class TotalOrderedTopicProxy extends TopicProxy {
+public class TotalOrderedTopicProxy<E> extends TopicProxySupport implements ITopic<E> {
 
     private final int partitionId;
 
@@ -38,8 +41,19 @@ public class TotalOrderedTopicProxy extends TopicProxy {
         partitionId = nodeEngine.getPartitionService().getPartitionId(name);
     }
 
-    @Override
-    public void publish(Object message) {
+    public String addMessageListener(MessageListener<E> listener) {
+        return addMessageListenerInternal(listener);
+    }
+
+    public boolean removeMessageListener(final String registrationId) {
+        return removeMessageListenerInternal(registrationId);
+    }
+
+    public LocalTopicStats getLocalTopicStats() {
+        return getLocalTopicStatsInternal();
+    }
+
+    public void publish(E message) {
         try {
             final NodeEngine nodeEngine = getNodeEngine();
             PublishOperation operation = new PublishOperation(getName(), nodeEngine.toData(message));

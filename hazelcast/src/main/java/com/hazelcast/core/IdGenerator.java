@@ -19,7 +19,7 @@ package com.hazelcast.core;
 /**
  * Cluster-wide unique id generator.
  */
-public interface IdGenerator extends DistributedObject {
+public interface IdGenerator extends DistributedObject<Id> {
 
     /**
      * Try to initialize this IdGenerator instance with given id

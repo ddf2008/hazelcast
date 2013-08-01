@@ -43,7 +43,7 @@ final class ConditionImpl implements ICondition {
 
     public ConditionImpl(LockProxy lockProxy, String id) {
         this.lockProxy = lockProxy;
-        this.partitionId = lockProxy.getNodeEngine().getPartitionService().getPartitionId(lockProxy.key);
+        this.partitionId = lockProxy.getNodeEngine().getPartitionService().getPartitionId(lockProxy.keyData);
         this.conditionId = id;
     }
 
@@ -72,7 +72,7 @@ final class ConditionImpl implements ICondition {
         final int threadId = ThreadUtil.getThreadId();
 
         final Invocation inv1 = nodeEngine.getOperationService().createInvocationBuilder(SERVICE_NAME,
-                new BeforeAwaitOperation(lockProxy.namespace, lockProxy.key,
+                new BeforeAwaitOperation(lockProxy.namespace, lockProxy.keyData,
                         threadId, conditionId), partitionId).build();
         try {
             Future f = inv1.invoke();
@@ -81,7 +81,7 @@ final class ConditionImpl implements ICondition {
             throw ExceptionUtil.rethrow(t);
         }
         final Invocation inv2 = nodeEngine.getOperationService().createInvocationBuilder(SERVICE_NAME,
-                new AwaitOperation(lockProxy.namespace, lockProxy.key,
+                new AwaitOperation(lockProxy.namespace, lockProxy.keyData,
                         threadId, unit.toMillis(time), conditionId), partitionId).build();
         try {
             Future f = inv2.invoke();
@@ -103,7 +103,7 @@ final class ConditionImpl implements ICondition {
     private void signal(boolean all) {
         final NodeEngine nodeEngine = lockProxy.getNodeEngine();
         final Invocation inv = nodeEngine.getOperationService().createInvocationBuilder(SERVICE_NAME,
-                new SignalOperation(lockProxy.namespace, lockProxy.key,
+                new SignalOperation(lockProxy.namespace, lockProxy.keyData,
                         ThreadUtil.getThreadId(), conditionId, all), partitionId).build();
         Future f = inv.invoke();
         try {

@@ -29,7 +29,7 @@ import java.util.Collection;
  * @param <K> key
  * @param <V> value
  */
-public interface TransactionalMultiMap<K, V> extends BaseMultiMap<K, V>, TransactionalObject {
+public interface TransactionalMultiMap<K, V> extends BaseMultiMap<K, V>, TransactionalObject<String> {
 
     /**
      * {@inheritDoc}

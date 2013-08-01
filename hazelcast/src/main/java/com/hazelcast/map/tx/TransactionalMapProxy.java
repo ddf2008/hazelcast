@@ -20,8 +20,6 @@ import com.hazelcast.core.TransactionalMap;
 import com.hazelcast.map.MapService;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.NodeEngine;
-import com.hazelcast.transaction.TransactionNotActiveException;
-import com.hazelcast.transaction.impl.Transaction;
 import com.hazelcast.transaction.impl.TransactionSupport;
 
 import java.util.HashMap;
@@ -30,9 +28,9 @@ import java.util.Map;
 /**
  * @author mdogan 2/26/13
  */
-public class TransactionalMapProxy extends TransactionalMapProxySupport implements TransactionalMap {
+public class TransactionalMapProxy<K, V> extends TransactionalMapProxySupport implements TransactionalMap<K, V> {
 
-    private final Map<Object, TxnValueWrapper> txMap = new HashMap<Object, TxnValueWrapper>();
+    private final Map<Object, TxnValueWrapper<V>> txMap = new HashMap<Object, TxnValueWrapper<V>>();
 
     public TransactionalMapProxy(String name, MapService mapService, NodeEngine nodeEngine, TransactionSupport transaction) {
         super(name, mapService, nodeEngine, transaction);
@@ -61,66 +59,65 @@ public class TransactionalMapProxy extends TransactionalMapProxySupport implemen
         return size() == 0;
     }
 
-    public Object get(Object key) {
+    public V get(Object key) {
         checkTransactionState();
         TxnValueWrapper currentValue = txMap.get(key);
         if (currentValue != null) {
             return checkIfRemoved(currentValue);
         }
-        return getService().toObject(getInternal(getService().toData(key)));
+        return (V) getService().toObject(getInternal(getService().toData(key)));
     }
 
-    private Object checkIfRemoved(TxnValueWrapper wrapper) {
+    private V checkIfRemoved(TxnValueWrapper<V> wrapper) {
         checkTransactionState();
         return wrapper == null || wrapper.type == TxnValueWrapper.Type.REMOVED ? null : wrapper.value;
     }
 
-    public Object put(Object key, Object value) {
+    public V put(K key, V value) {
         checkTransactionState();
-        final Object valueBeforeTxn = getService().toObject(putInternal(getService().toData(key), getService().toData(value)));
-        TxnValueWrapper currentValue = txMap.get(key);
+        final V valueBeforeTxn = (V) getService().toObject(putInternal(getService().toData(key), getService().toData(value)));
+        TxnValueWrapper<V> currentValue = txMap.get(key);
         if (value != null) {
-            TxnValueWrapper wrapper = valueBeforeTxn == null ? new TxnValueWrapper(value, TxnValueWrapper.Type.NEW) : new TxnValueWrapper(value, TxnValueWrapper.Type.UPDATED);
+            TxnValueWrapper<V> wrapper = valueBeforeTxn == null ? new TxnValueWrapper<V>(value, TxnValueWrapper.Type.NEW) : new TxnValueWrapper<V>(value, TxnValueWrapper.Type.UPDATED);
             txMap.put(key, wrapper);
         }
         return currentValue == null ? valueBeforeTxn : checkIfRemoved(currentValue);
     }
 
-    @Override
-    public void set(Object key, Object value) {
+    public void set(K key, V value) {
         checkTransactionState();
         final Data dataBeforeTxn = putInternal(getService().toData(key), getService().toData(value));
         if (value != null) {
-            TxnValueWrapper wrapper = dataBeforeTxn == null ? new TxnValueWrapper(value, TxnValueWrapper.Type.NEW) : new TxnValueWrapper(value, TxnValueWrapper.Type.UPDATED);
+            TxnValueWrapper<V> wrapper = dataBeforeTxn == null ? new TxnValueWrapper<V>(value, TxnValueWrapper.Type.NEW) : new TxnValueWrapper<V>(value, TxnValueWrapper.Type.UPDATED);
             txMap.put(key, wrapper);
         }
     }
 
     @Override
-    public Object putIfAbsent(Object key, Object value) {
+    public V putIfAbsent(K key, V value) {
         checkTransactionState();
-        TxnValueWrapper wrapper = txMap.get(key);
+        TxnValueWrapper<V> wrapper = txMap.get(key);
         boolean haveTxnPast = wrapper != null;
         if (haveTxnPast) {
             if (wrapper.type != TxnValueWrapper.Type.REMOVED) {
                 return wrapper.value;
             }
             putInternal(getService().toData(key), getService().toData(value));
-            txMap.put(key, new TxnValueWrapper(value, TxnValueWrapper.Type.NEW));
+            txMap.put(key, new TxnValueWrapper<V>(value, TxnValueWrapper.Type.NEW));
             return null;
         } else {
             Data oldValue = putIfAbsentInternal(getService().toData(key), getService().toData(value));
             if (oldValue == null) {
-                txMap.put(key, new TxnValueWrapper(value, TxnValueWrapper.Type.NEW));
+                txMap.put(key, new TxnValueWrapper<V>(value, TxnValueWrapper.Type.NEW));
             }
-            return getService().toObject(oldValue);
+            return (V) getService().toObject(oldValue);
         }
     }
 
     @Override
-    public Object replace(Object key, Object value) {
+    public V replace(K key, V value) {
         checkTransactionState();
-        TxnValueWrapper wrapper = txMap.get(key);
+        TxnValueWrapper<V> wrapper = txMap.get(key);
         boolean haveTxnPast = wrapper != null;
 
         if (haveTxnPast) {
@@ -128,21 +125,21 @@ public class TransactionalMapProxy extends TransactionalMapProxySupport implemen
                 return null;
             }
             putInternal(getService().toData(key), getService().toData(value));
-            txMap.put(key, new TxnValueWrapper(value, TxnValueWrapper.Type.UPDATED));
+            txMap.put(key, new TxnValueWrapper<V>(value, TxnValueWrapper.Type.UPDATED));
             return wrapper.value;
         } else {
             Data oldValue = replaceInternal(getService().toData(key), getService().toData(value));
             if (oldValue != null) {
-                txMap.put(key, new TxnValueWrapper(value, TxnValueWrapper.Type.UPDATED));
+                txMap.put(key, new TxnValueWrapper<V>(value, TxnValueWrapper.Type.UPDATED));
             }
-            return getService().toObject(oldValue);
+            return (V) getService().toObject(oldValue);
         }
     }
 
     @Override
-    public boolean replace(Object key, Object oldValue, Object newValue) {
+    public boolean replace(K key, V oldValue, V newValue) {
         checkTransactionState();
-        TxnValueWrapper wrapper = txMap.get(key);
+        TxnValueWrapper<V> wrapper = txMap.get(key);
         boolean haveTxnPast = wrapper != null;
 
         if (haveTxnPast) {
@@ -150,12 +147,12 @@ public class TransactionalMapProxy extends TransactionalMapProxySupport implemen
                 return false;
             }
             putInternal(getService().toData(key), getService().toData(newValue));
-            txMap.put(key, new TxnValueWrapper(wrapper.value, TxnValueWrapper.Type.UPDATED));
+            txMap.put(key, new TxnValueWrapper<V>(wrapper.value, TxnValueWrapper.Type.UPDATED));
             return true;
         } else {
             boolean success = replaceIfSameInternal(getService().toData(key), getService().toData(oldValue), getService().toData(newValue));
             if (success) {
-                txMap.put(key, new TxnValueWrapper(newValue, TxnValueWrapper.Type.UPDATED));
+                txMap.put(key, new TxnValueWrapper<V>(newValue, TxnValueWrapper.Type.UPDATED));
             }
             return success;
         }
@@ -177,12 +174,12 @@ public class TransactionalMapProxy extends TransactionalMapProxySupport implemen
     }
 
     @Override
-    public Object remove(Object key) {
+    public V remove(Object key) {
         checkTransactionState();
-        final Object valueBeforeTxn = getService().toObject(removeInternal(getService().toData(key)));
-        TxnValueWrapper wrapper = null;
+        final V valueBeforeTxn = (V) getService().toObject(removeInternal(getService().toData(key)));
+        TxnValueWrapper<V> wrapper = null;
         if(valueBeforeTxn != null || txMap.containsKey(key) ) {
-            wrapper = txMap.put(key, new TxnValueWrapper(valueBeforeTxn, TxnValueWrapper.Type.REMOVED));
+            wrapper = txMap.put(key, new TxnValueWrapper<V>(valueBeforeTxn, TxnValueWrapper.Type.REMOVED));
         }
         return wrapper == null ? valueBeforeTxn : checkIfRemoved(wrapper);
     }
@@ -196,4 +193,7 @@ public class TransactionalMapProxy extends TransactionalMapProxySupport implemen
         }
     }
 
+    public String getId() {
+        return name;
+    }
 }

@@ -22,10 +22,10 @@ import com.hazelcast.collection.operations.*;
 import com.hazelcast.collection.operations.MultiMapOperationFactory.OperationFactoryType;
 import com.hazelcast.concurrent.lock.proxy.LockProxySupport;
 import com.hazelcast.config.MultiMapConfig;
-import com.hazelcast.util.ThreadUtil;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.*;
 import com.hazelcast.util.ExceptionUtil;
+import com.hazelcast.util.ThreadUtil;
 
 import java.util.*;
 import java.util.concurrent.Future;
@@ -33,7 +33,7 @@ import java.util.concurrent.Future;
 /**
  * @author ali 1/2/13
  */
-public abstract class MultiMapProxySupport extends AbstractDistributedObject<CollectionService> {
+public abstract class MultiMapProxySupport<ID> extends AbstractDistributedObject<ID, CollectionService> {
 
     protected final MultiMapConfig config;
     protected final CollectionProxyId proxyId;
@@ -267,10 +267,6 @@ public abstract class MultiMapProxySupport extends AbstractDistributedObject<Col
         } catch (Throwable throwable) {
             throw ExceptionUtil.rethrow(throwable);
         }
-    }
-
-    public Object getId() {
-        return proxyId;
     }
 
     public String getName() {

@@ -21,6 +21,6 @@ import com.hazelcast.core.DistributedObject;
 /**
  * Marker interface for all transactional distributed objects.
  */
-public interface TransactionalObject extends DistributedObject {
+public interface TransactionalObject<ID> extends DistributedObject<ID> {
 
 }

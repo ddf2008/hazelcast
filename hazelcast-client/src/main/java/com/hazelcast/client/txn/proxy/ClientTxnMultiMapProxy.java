@@ -32,10 +32,10 @@ import java.util.List;
 /**
  * @author ali 6/10/13
  */
-public class ClientTxnMultiMapProxy<K, V> extends ClientTxnProxy implements TransactionalMultiMap<K,V> {
+public class ClientTxnMultiMapProxy<K, V> extends ClientTxnProxy<String> implements TransactionalMultiMap<K,V> {
 
     public ClientTxnMultiMapProxy(CollectionProxyId id, TransactionContextProxy proxy) {
-        super(id, proxy);
+        super(id.getName(), proxy);
     }
 
     public boolean put(K key, V value) throws TransactionException {
@@ -95,8 +95,7 @@ public class ClientTxnMultiMapProxy<K, V> extends ClientTxnProxy implements Tran
     }
 
     public String getName() {
-        final CollectionProxyId proxyId = (CollectionProxyId)getId();
-        return proxyId.getName();
+        return getId();
     }
 
     void onDestroy() {

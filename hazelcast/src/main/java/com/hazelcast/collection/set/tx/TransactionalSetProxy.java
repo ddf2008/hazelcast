@@ -19,7 +19,9 @@ package com.hazelcast.collection.set.tx;
 import com.hazelcast.collection.CollectionProxyId;
 import com.hazelcast.collection.CollectionService;
 import com.hazelcast.collection.multimap.tx.TransactionalMultiMapProxySupport;
+import com.hazelcast.collection.set.ObjectSetProxy;
 import com.hazelcast.config.MultiMapConfig;
+import com.hazelcast.core.Id;
 import com.hazelcast.core.TransactionalSet;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.NodeEngine;
@@ -28,14 +30,18 @@ import com.hazelcast.transaction.impl.TransactionSupport;
 /**
  * @author ali 4/16/13
  */
-public class TransactionalSetProxy<E> extends TransactionalMultiMapProxySupport implements TransactionalSet<E> {
+public class TransactionalSetProxy<E> extends TransactionalMultiMapProxySupport<Id> implements TransactionalSet<E> {
 
     final Data key;
 
     public TransactionalSetProxy(NodeEngine nodeEngine, CollectionService service, CollectionProxyId proxyId, TransactionSupport tx) {
-        super(nodeEngine, service, proxyId, tx,
-                nodeEngine.getConfig().getMultiMapConfig("set:" + proxyId.getKeyName()).setValueCollectionType(MultiMapConfig.ValueCollectionType.SET));
-        this.key = nodeEngine.toData(proxyId.getKeyName());
+        super(nodeEngine, service, proxyId, tx, createConfig(proxyId));
+        this.key = nodeEngine.toData(getId());
+    }
+
+    private static MultiMapConfig createConfig(CollectionProxyId proxyId) {
+        return new MultiMapConfig().setName(ObjectSetProxy.COLLECTION_SET_NAME + proxyId.getKeyName())
+                .setValueCollectionType(MultiMapConfig.ValueCollectionType.SET);
     }
 
     public boolean add(E e) {
@@ -55,4 +61,7 @@ public class TransactionalSetProxy<E> extends TransactionalMultiMapProxySupport 
         return valueCountInternal(key);
     }
 
+    public Id getId() {
+        return new Id(proxyId.getKeyName(), proxyId.getPartitionKey());
+    }
 }

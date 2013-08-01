@@ -21,7 +21,7 @@ import com.hazelcast.transaction.TransactionalObject;
 /**
  * Transactional implementation of {@link ISet}.
  */
-public interface TransactionalSet<E> extends TransactionalObject {
+public interface TransactionalSet<E> extends TransactionalObject<Id> {
 
     /**
      * Add new item to transactional set

@@ -17,6 +17,7 @@
 package com.hazelcast.concurrent.atomiclong;
 
 import com.hazelcast.concurrent.atomiclong.proxy.AtomicLongProxy;
+import com.hazelcast.core.Id;
 import com.hazelcast.partition.MigrationEndpoint;
 import com.hazelcast.spi.*;
 import com.hazelcast.util.ConcurrencyUtil;
@@ -30,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 // author: sancar - 21.12.2012
-public class AtomicLongService implements ManagedService, RemoteService, MigrationAwareService {
+public class AtomicLongService implements ManagedService, RemoteService<Id>, MigrationAwareService {
 
     public static final String SERVICE_NAME = "hz:impl:atomicLongService";
     private NodeEngine nodeEngine;
@@ -62,12 +63,12 @@ public class AtomicLongService implements ManagedService, RemoteService, Migrati
         reset();
     }
 
-    public AtomicLongProxy createDistributedObject(Object objectId) {
-        return new AtomicLongProxy(String.valueOf(objectId), nodeEngine, this);
+    public AtomicLongProxy createDistributedObject(Id objectId) {
+        return new AtomicLongProxy(objectId, nodeEngine, this);
     }
 
-    public void destroyDistributedObject(Object objectId) {
-        numbers.remove(String.valueOf(objectId));
+    public void destroyDistributedObject(Id objectId) {
+        numbers.remove(objectId.getName());
     }
 
     public void beforeMigration(PartitionMigrationEvent partitionMigrationEvent) {

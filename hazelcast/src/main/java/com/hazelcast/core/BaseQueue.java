@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  * @see TransactionalQueue
  * @param <E>
  */
-public interface BaseQueue<E> extends DistributedObject {
+public interface BaseQueue<E> extends DistributedObject<Id> {
 
     /**
      * Inserts the specified element into this queue if it is possible to do

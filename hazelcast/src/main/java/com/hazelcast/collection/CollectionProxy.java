@@ -17,14 +17,12 @@
 package com.hazelcast.collection;
 
 
-import com.hazelcast.core.DistributedObject;
-
 import java.util.Collection;
 
 /**
  * @author ali 1/1/13
  */
-public interface CollectionProxy extends DistributedObject {
+public interface CollectionProxy {
 
     <V> Collection<V> createNew();
 

@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  * @see IQueue
  * @param <E>
  */
-public interface TransactionalQueue<E> extends TransactionalObject, BaseQueue<E> {
+public interface TransactionalQueue<E> extends TransactionalObject<Id>, BaseQueue<E> {
 
     /**
      * {@inheritDoc}

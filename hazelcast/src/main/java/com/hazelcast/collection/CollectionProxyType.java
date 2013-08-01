@@ -21,19 +21,19 @@ package com.hazelcast.collection;
  */
 public enum CollectionProxyType {
 
-    MULTI_MAP(0), LIST(1), SET(2), QUEUE(3);
+    MULTI_MAP((byte) 0), LIST((byte) 1), SET((byte) 2), QUEUE((byte) 3);
 
-    private final int type;
+    private final byte type;
 
-    private CollectionProxyType(final int type) {
+    private CollectionProxyType(final byte type) {
         this.type = type;
     }
 
-    public int getType() {
+    public byte getType() {
         return type;
     }
 
-    public static CollectionProxyType getByType(final int proxyType) {
+    public static CollectionProxyType getByType(final byte proxyType) {
         for (CollectionProxyType collectionProxyType : values()) {
             if (collectionProxyType.type == proxyType) {
                 return collectionProxyType;

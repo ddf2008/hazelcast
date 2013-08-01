@@ -17,6 +17,7 @@
 package com.hazelcast.queue.tx;
 
 import com.hazelcast.config.QueueConfig;
+import com.hazelcast.core.Id;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.queue.QueueItem;
 import com.hazelcast.queue.QueueService;
@@ -39,7 +40,7 @@ import java.util.concurrent.Future;
 /**
  * @author ali 3/25/13
  */
-public abstract class TransactionalQueueProxySupport extends AbstractDistributedObject<QueueService> implements TransactionalObject {
+public abstract class TransactionalQueueProxySupport extends AbstractDistributedObject<Id, QueueService> implements TransactionalObject<Id> {
 
     protected final String name;
     protected final TransactionSupport tx;
@@ -122,8 +123,8 @@ public abstract class TransactionalQueueProxySupport extends AbstractDistributed
         }
     }
 
-    public Object getId() {
-        return name;
+    public Id getId() {
+        return new Id(name);
     }
 
     public String getName() {

@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author mdogan 1/17/13
  */
-public class ExecutorServiceProxy extends AbstractDistributedObject<DistributedExecutorService> implements IExecutorService {
+public class ExecutorServiceProxy extends AbstractDistributedObject<String, DistributedExecutorService> implements IExecutorService {
 
     private final String name;
     private final Random random = new Random();
@@ -365,7 +365,7 @@ public class ExecutorServiceProxy extends AbstractDistributedObject<DistributedE
         return DistributedExecutorService.SERVICE_NAME;
     }
 
-    public Object getId() {
+    public String getId() {
         return name;
     }
 

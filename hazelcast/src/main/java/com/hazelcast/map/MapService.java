@@ -58,13 +58,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
 
 /**
  * @author enesakar 1/17/13
  */
 public class MapService implements ManagedService, MigrationAwareService,
-        TransactionalService, RemoteService, EventPublishingService<EventData, EntryListener>,
+        TransactionalService, RemoteService<String>, EventPublishingService<EventData, EntryListener>,
         PostJoinAwareService, SplitBrainHandlerService, ReplicationSupportingService {
 
     public final static String SERVICE_NAME = "hz:impl:mapService";
@@ -455,14 +454,12 @@ public class MapService implements ManagedService, MigrationAwareService,
         return nodeEngine;
     }
 
-    public MapProxyImpl createDistributedObject(Object objectId) {
-        final String name = String.valueOf(objectId);
+    public MapProxyImpl createDistributedObject(String name) {
         return new MapProxyImpl(name, this, nodeEngine);
     }
 
-    public void destroyDistributedObject(Object objectId) {
-        logger.warning("Destroying object: " + objectId);
-        final String name = String.valueOf(objectId);
+    public void destroyDistributedObject(String name) {
+        logger.warning("Destroying object: " + name);
         mapContainers.remove(name);
         final PartitionContainer[] containers = partitionContainers;
         for (PartitionContainer container : containers) {

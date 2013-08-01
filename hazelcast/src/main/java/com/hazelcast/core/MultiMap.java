@@ -48,7 +48,7 @@ import java.util.concurrent.TimeUnit;
  * @author oztalip
  * @see IMap
  */
-public interface MultiMap<K, V> extends BaseMultiMap<K, V>, DistributedObject {
+public interface MultiMap<K, V> extends BaseMultiMap<K, V>, DistributedObject<String> {
 
     /**
      * Returns the name of this multimap.

@@ -36,7 +36,7 @@ import java.util.List;
  * Date: 2/26/13
  * Time: 11:44 AM
  */
-abstract class TopicProxySupport extends AbstractDistributedObject<TopicService> {
+abstract class TopicProxySupport extends AbstractDistributedObject<String, TopicService> {
 
     private final String name;
 
@@ -90,7 +90,7 @@ abstract class TopicProxySupport extends AbstractDistributedObject<TopicService>
         return TopicService.SERVICE_NAME;
     }
 
-    public Object getId() {
+    public String getId() {
         return name;
     }
 

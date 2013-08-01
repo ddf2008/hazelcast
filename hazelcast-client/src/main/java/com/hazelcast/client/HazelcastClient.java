@@ -31,10 +31,7 @@ import com.hazelcast.client.spi.impl.ClientPartitionServiceImpl;
 import com.hazelcast.client.txn.TransactionContextProxy;
 import com.hazelcast.client.util.RoundRobinLB;
 import com.hazelcast.collection.CollectionProxyId;
-import com.hazelcast.collection.CollectionProxyType;
 import com.hazelcast.collection.CollectionService;
-import com.hazelcast.collection.list.ObjectListProxy;
-import com.hazelcast.collection.set.ObjectSetProxy;
 import com.hazelcast.concurrent.atomiclong.AtomicLongService;
 import com.hazelcast.concurrent.countdownlatch.CountDownLatchService;
 import com.hazelcast.concurrent.idgen.IdGeneratorService;
@@ -163,7 +160,12 @@ public final class HazelcastClient implements HazelcastInstance {
 
     @Override
     public <E> IQueue<E> getQueue(String name) {
-        return getDistributedObject(QueueService.SERVICE_NAME, name);
+        return getQueue(new Id(name));
+    }
+
+    @Override
+    public <E> IQueue<E> getQueue(Id id) {
+        return getDistributedObject(QueueService.SERVICE_NAME, id);
     }
 
     @Override
@@ -173,14 +175,22 @@ public final class HazelcastClient implements HazelcastInstance {
 
     @Override
     public <E> ISet<E> getSet(String name) {
-        return getDistributedObject(CollectionService.SERVICE_NAME,
-                new CollectionProxyId(ObjectSetProxy.COLLECTION_SET_NAME, name, CollectionProxyType.SET));
+        return getSet(new Id(name));
+    }
+
+    @Override
+    public <E> ISet<E> getSet(Id id) {
+        return getDistributedObject(CollectionService.SERVICE_NAME, CollectionProxyId.newSetProxyId(id.getName(), id.getPartitionKey()));
     }
 
     @Override
     public <E> IList<E> getList(String name) {
-        return getDistributedObject(CollectionService.SERVICE_NAME,
-                new CollectionProxyId(ObjectListProxy.COLLECTION_LIST_NAME, name, CollectionProxyType.LIST));
+        return getList(new Id(name));
+    }
+
+    @Override
+    public <E> IList<E> getList(Id id) {
+        return getDistributedObject(CollectionService.SERVICE_NAME, CollectionProxyId.newListProxyId(id.getName(), id.getPartitionKey()));
     }
 
     @Override
@@ -190,13 +200,17 @@ public final class HazelcastClient implements HazelcastInstance {
 
     @Override
     public <K, V> MultiMap<K, V> getMultiMap(String name) {
-        return getDistributedObject(CollectionService.SERVICE_NAME,
-                new CollectionProxyId(name, null, CollectionProxyType.MULTI_MAP));
+        return getDistributedObject(CollectionService.SERVICE_NAME, CollectionProxyId.newMultiMapProxyId(name));
     }
 
     @Override
     public ILock getLock(Object key) {
         return getDistributedObject(LockServiceImpl.SERVICE_NAME, key);
+    }
+
+    @Override
+    public ILock getLock(Id id) {
+        return getDistributedObject(LockServiceImpl.SERVICE_NAME, id);
     }
 
     @Override
@@ -249,22 +263,42 @@ public final class HazelcastClient implements HazelcastInstance {
 
     @Override
     public IdGenerator getIdGenerator(String name) {
-        return getDistributedObject(IdGeneratorService.SERVICE_NAME, name);
+        return getIdGenerator(new Id(name));
+    }
+
+    @Override
+    public IdGenerator getIdGenerator(Id id) {
+        return getDistributedObject(IdGeneratorService.SERVICE_NAME, id);
     }
 
     @Override
     public IAtomicLong getAtomicLong(String name) {
-        return getDistributedObject(AtomicLongService.SERVICE_NAME, name);
+        return getAtomicLong(new Id(name));
+    }
+
+    @Override
+    public IAtomicLong getAtomicLong(Id id) {
+        return getDistributedObject(AtomicLongService.SERVICE_NAME, id);
     }
 
     @Override
     public ICountDownLatch getCountDownLatch(String name) {
-        return getDistributedObject(CountDownLatchService.SERVICE_NAME, name);
+        return getCountDownLatch(new Id(name));
+    }
+
+    @Override
+    public ICountDownLatch getCountDownLatch(Id id) {
+        return getDistributedObject(CountDownLatchService.SERVICE_NAME, id);
     }
 
     @Override
     public ISemaphore getSemaphore(String name) {
-        return getDistributedObject(SemaphoreService.SERVICE_NAME, name);
+        return getSemaphore(new Id(name));
+    }
+
+    @Override
+    public ISemaphore getSemaphore(Id id) {
+        return getDistributedObject(SemaphoreService.SERVICE_NAME, id);
     }
 
     @Override

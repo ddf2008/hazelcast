@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author ali 5/24/13
  */
-public class ClientExecutorServiceProxy extends ClientProxy implements IExecutorService {
+public class ClientExecutorServiceProxy extends ClientProxy<String> implements IExecutorService {
 
     private final String name;
     private final AtomicInteger consecutiveSubmits = new AtomicInteger();

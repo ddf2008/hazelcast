@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  * after a countdown has finished but not during an active count. This allows the same
  * latch instance to be reused.
  */
-public interface ICountDownLatch extends DistributedObject {
+public interface ICountDownLatch extends DistributedObject<Id> {
 
     /**
      * Causes the current thread to wait until the latch has counted down to

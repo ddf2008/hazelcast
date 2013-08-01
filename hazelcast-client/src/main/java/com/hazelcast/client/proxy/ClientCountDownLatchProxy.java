@@ -19,6 +19,7 @@ package com.hazelcast.client.proxy;
 import com.hazelcast.client.spi.ClientProxy;
 import com.hazelcast.concurrent.countdownlatch.client.*;
 import com.hazelcast.core.ICountDownLatch;
+import com.hazelcast.core.Id;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.util.ExceptionUtil;
 
@@ -27,11 +28,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author ali 5/28/13
  */
-public class ClientCountDownLatchProxy extends ClientProxy implements ICountDownLatch{
+public class ClientCountDownLatchProxy extends ClientProxy<Id> implements ICountDownLatch {
 
     Data key;
 
-    public ClientCountDownLatchProxy(String serviceName, String objectId) {
+    public ClientCountDownLatchProxy(String serviceName, Id objectId) {
         super(serviceName, objectId);
     }
 
@@ -64,16 +65,12 @@ public class ClientCountDownLatchProxy extends ClientProxy implements ICountDown
     }
 
     public String getName() {
-        return (String)getId();
+        return getId().getName();
     }
 
-    private Data toData(Object o){
-        return getContext().getSerializationService().toData(o);
-    }
-
-    private Data getKey(){
-        if (key == null){
-            key = toData(getId());
+    private Data getKey() {
+        if (key == null) {
+            key = getContext().getSerializationService().toData(getId());
         }
         return key;
     }

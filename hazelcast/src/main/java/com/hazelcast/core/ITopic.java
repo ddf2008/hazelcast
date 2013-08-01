@@ -29,7 +29,7 @@ import com.hazelcast.monitor.LocalTopicStats;
  * and process m1, m2, m3...mn in order.
  *
  */
-public interface ITopic<E> extends DistributedObject {
+public interface ITopic<E> extends DistributedObject<String> {
 
     /**
      * Returns the name of this ITopic instance

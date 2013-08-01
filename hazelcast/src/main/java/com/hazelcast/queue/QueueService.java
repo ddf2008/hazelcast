@@ -16,10 +16,10 @@
 
 package com.hazelcast.queue;
 
+import com.hazelcast.core.Id;
 import com.hazelcast.core.ItemEvent;
 import com.hazelcast.core.ItemEventType;
 import com.hazelcast.core.ItemListener;
-import com.hazelcast.logging.ILogger;
 import com.hazelcast.monitor.LocalQueueStats;
 import com.hazelcast.monitor.impl.LocalQueueStatsImpl;
 import com.hazelcast.nio.Address;
@@ -48,13 +48,12 @@ import java.util.concurrent.ConcurrentMap;
  * Time: 12:21 AM
  */
 public class QueueService implements ManagedService, MigrationAwareService, TransactionalService,
-        RemoteService, EventPublishingService<QueueEvent, ItemListener> {
+        RemoteService<Id>, EventPublishingService<QueueEvent, ItemListener> {
 
     public static final String SERVICE_NAME = "hz:impl:queueService";
     private final NodeEngine nodeEngine;
     private final ConcurrentMap<String, QueueContainer> containerMap = new ConcurrentHashMap<String, QueueContainer>();
     private final ConcurrentMap<String, LocalQueueStatsImpl> statsMap = new ConcurrentHashMap<String, LocalQueueStatsImpl>(1000);
-    private final ILogger logger;
     private final ConstructorFunction<String, LocalQueueStatsImpl> localQueueStatsConstructorFunction = new ConstructorFunction<String, LocalQueueStatsImpl>() {
         public LocalQueueStatsImpl createNew(String key) {
             return new LocalQueueStatsImpl();
@@ -64,7 +63,6 @@ public class QueueService implements ManagedService, MigrationAwareService, Tran
 
     public QueueService(NodeEngine nodeEngine) {
         this.nodeEngine = nodeEngine;
-        logger = nodeEngine.getLogger(QueueService.class);
         queueEvictionScheduler = EntryTaskSchedulerFactory.newScheduler(nodeEngine.getExecutionService().getScheduledExecutor(), new QueueEvictionProcessor(nodeEngine, this), true);
     }
 
@@ -160,12 +158,12 @@ public class QueueService implements ManagedService, MigrationAwareService, Tran
         getLocalQueueStatsImpl(event.name).incrementReceivedEvents();
     }
 
-    public ObjectQueueProxy createDistributedObject(Object objectId) {
-        return new ObjectQueueProxy(String.valueOf(objectId), this, nodeEngine);
+    public ObjectQueueProxy createDistributedObject(Id objectId) {
+        return new ObjectQueueProxy(objectId, this, nodeEngine);
     }
 
-    public void destroyDistributedObject(Object objectId) {
-        final String name = String.valueOf(objectId);
+    public void destroyDistributedObject(Id objectId) {
+        final String name = objectId.getName();
         containerMap.remove(name);
         nodeEngine.getEventService().deregisterAllListeners(SERVICE_NAME, name);
     }

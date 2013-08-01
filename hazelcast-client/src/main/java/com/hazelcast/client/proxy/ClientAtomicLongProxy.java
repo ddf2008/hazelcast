@@ -19,20 +19,21 @@ package com.hazelcast.client.proxy;
 import com.hazelcast.client.spi.ClientProxy;
 import com.hazelcast.concurrent.atomiclong.client.*;
 import com.hazelcast.core.IAtomicLong;
+import com.hazelcast.core.Id;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.util.ExceptionUtil;
 
 /**
  * @author ali 5/24/13
  */
-public class ClientAtomicLongProxy extends ClientProxy implements IAtomicLong {
+public class ClientAtomicLongProxy extends ClientProxy<Id> implements IAtomicLong {
 
     private final String name;
     private Data key;
 
-    public ClientAtomicLongProxy(String serviceName, String objectId) {
+    public ClientAtomicLongProxy(String serviceName, Id objectId) {
         super(serviceName, objectId);
-        this.name = objectId;
+        this.name = objectId.getName();
     }
 
     public long addAndGet(long delta) {
@@ -99,7 +100,7 @@ public class ClientAtomicLongProxy extends ClientProxy implements IAtomicLong {
 
     private Data getKey(){
         if (key == null){
-            key = getContext().getSerializationService().toData(name);
+            key = getContext().getSerializationService().toData(getId());
         }
         return key;
     }

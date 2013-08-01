@@ -18,13 +18,14 @@ package com.hazelcast.concurrent.atomiclong.proxy;
 
 import com.hazelcast.concurrent.atomiclong.AtomicLongService;
 import com.hazelcast.core.IAtomicLong;
+import com.hazelcast.core.Id;
 import com.hazelcast.spi.NodeEngine;
 
 // author: sancar - 21.12.2012
 public class AtomicLongProxy extends AtomicLongProxySupport implements IAtomicLong {
 
-    public AtomicLongProxy(String name, NodeEngine nodeEngine, AtomicLongService service) {
-        super(name, nodeEngine, service);
+    public AtomicLongProxy(Id id, NodeEngine nodeEngine, AtomicLongService service) {
+        super(id, nodeEngine, service);
     }
 
     public long addAndGet(long delta) {

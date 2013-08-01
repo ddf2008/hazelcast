@@ -19,8 +19,8 @@ package com.hazelcast.client.spi;
 /**
  * @author mdogan 5/15/13
  */
-public interface ClientProxyFactory {
+public interface ClientProxyFactory<ID> {
 
-    ClientProxy create(Object id);
+    ClientProxy create(ID id);
 
 }

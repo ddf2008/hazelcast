@@ -34,7 +34,7 @@ import java.util.concurrent.Future;
  * @see ExecutionCallback
  * @see MultiExecutionCallback
  */
-public interface IExecutorService extends ExecutorService, DistributedObject {
+public interface IExecutorService extends ExecutorService, DistributedObject<String> {
 
     /**
      * Executes task on owner of the specified key

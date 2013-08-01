@@ -472,13 +472,13 @@ public class LockTest extends HazelcastTestSupport {
 
         final ILock lock1 = keyOwner.getLock(k);
         final ICondition condition1 = lock1.newCondition(name);
-        awaitLatch.await(1, TimeUnit.MINUTES);
+        assertTrue(awaitLatch.await(1, TimeUnit.MINUTES));
         lock1.lock();
         condition1.signalAll();
         lock1.unlock();
         keyOwner.getLifecycleService().shutdown();
 
-        finalLatch.await(2, TimeUnit.MINUTES);
+        assertTrue(finalLatch.await(2, TimeUnit.MINUTES));
         Assert.assertEquals(size, count.get());
     }
 

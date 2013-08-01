@@ -18,6 +18,7 @@ package com.hazelcast.client.proxy;
 
 import com.hazelcast.client.spi.ClientProxy;
 import com.hazelcast.core.IAtomicLong;
+import com.hazelcast.core.Id;
 import com.hazelcast.core.IdGenerator;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,8 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @author ali 5/28/13
  */
-public class ClientIdGeneratorProxy extends ClientProxy implements IdGenerator {
-
+public class ClientIdGeneratorProxy extends ClientProxy<Id> implements IdGenerator {
 
     private static final int BLOCK_SIZE = 10000;
 
@@ -39,10 +39,10 @@ public class ClientIdGeneratorProxy extends ClientProxy implements IdGenerator {
 
     AtomicLong local;
 
-    public ClientIdGeneratorProxy(String serviceName, String objectId, IAtomicLong atomicLong) {
+    public ClientIdGeneratorProxy(String serviceName, Id objectId, IAtomicLong atomicLong) {
         super(serviceName, objectId);
         this.atomicLong = atomicLong;
-        this.name = objectId;
+        this.name = objectId.getName();
         residue = new AtomicInteger(BLOCK_SIZE);
         local = new AtomicLong(-1);
     }

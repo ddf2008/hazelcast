@@ -16,9 +16,9 @@
 
 package com.hazelcast.map.tx;
 
+import com.hazelcast.map.MapService;
 import com.hazelcast.map.operation.ContainsKeyOperation;
 import com.hazelcast.map.operation.GetOperation;
-import com.hazelcast.map.MapService;
 import com.hazelcast.map.operation.SizeOperationFactory;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.AbstractDistributedObject;
@@ -40,7 +40,7 @@ import static com.hazelcast.map.MapService.SERVICE_NAME;
 /**
  * @author mdogan 2/26/13
  */
-public abstract class TransactionalMapProxySupport extends AbstractDistributedObject<MapService> implements TransactionalObject {
+public abstract class TransactionalMapProxySupport extends AbstractDistributedObject<String, MapService> implements TransactionalObject<String> {
 
     protected final String name;
     protected final TransactionSupport tx;
@@ -188,9 +188,9 @@ public abstract class TransactionalMapProxySupport extends AbstractDistributedOb
         }
     }
 
-    public Object getId() {
-        return name;
-    }
+//    public String getId() {
+//        return name;
+//    }
 
     public String getName() {
         return name;

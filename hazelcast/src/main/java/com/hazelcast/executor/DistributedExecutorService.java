@@ -28,12 +28,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
 
 /**
  * @author mdogan 1/18/13
  */
-public class DistributedExecutorService implements ManagedService, RemoteService {
+public class DistributedExecutorService implements ManagedService, RemoteService<String> {
 
     public static final String SERVICE_NAME = "hz:impl:executorService";
 
@@ -91,13 +90,11 @@ public class DistributedExecutorService implements ManagedService, RemoteService
         return shutdownExecutors.contains(name);
     }
 
-    public ExecutorServiceProxy createDistributedObject(Object objectId) {
-        final String name = String.valueOf(objectId);
+    public ExecutorServiceProxy createDistributedObject(String name) {
         return new ExecutorServiceProxy(name, nodeEngine, this);
     }
 
-    public void destroyDistributedObject(Object objectId) {
-        final String name = String.valueOf(objectId);
+    public void destroyDistributedObject(String name) {
         shutdownExecutors.remove(name);
         executionService.shutdownExecutor(name);
     }

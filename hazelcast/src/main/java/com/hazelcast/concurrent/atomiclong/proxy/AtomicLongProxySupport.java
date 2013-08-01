@@ -17,6 +17,7 @@
 package com.hazelcast.concurrent.atomiclong.proxy;
 
 import com.hazelcast.concurrent.atomiclong.*;
+import com.hazelcast.core.Id;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.Invocation;
 import com.hazelcast.spi.NodeEngine;
@@ -29,20 +30,20 @@ import java.util.concurrent.Future;
  * Date: 2/26/13
  * Time: 12:22 PM
  */
-public class AtomicLongProxySupport extends AbstractDistributedObject<AtomicLongService> {
+public class AtomicLongProxySupport extends AbstractDistributedObject<Id, AtomicLongService> {
 
-    private final String name;
+    private final Id id;
     private final int partitionId;
 
-    public AtomicLongProxySupport(String name, NodeEngine nodeEngine, AtomicLongService service) {
+    public AtomicLongProxySupport(Id id, NodeEngine nodeEngine, AtomicLongService service) {
         super(nodeEngine, service);
-        this.name = name;
-        this.partitionId = nodeEngine.getPartitionService().getPartitionId(nodeEngine.toData(name));
+        this.id = id;
+        this.partitionId = nodeEngine.getPartitionService().getPartitionId(nodeEngine.toData(id));
     }
 
     public long addAndGetInternal(long delta) {
         try {
-            AddAndGetOperation operation = new AddAndGetOperation(name, delta);
+            AddAndGetOperation operation = new AddAndGetOperation(id.getName(), delta);
             Invocation inv = getNodeEngine().getOperationService().createInvocationBuilder(AtomicLongService.SERVICE_NAME, operation, partitionId).build();
             Future f = inv.invoke();
             return (Long) f.get();
@@ -53,7 +54,7 @@ public class AtomicLongProxySupport extends AbstractDistributedObject<AtomicLong
 
     public boolean compareAndSetInternal(long expect, long update) {
         try {
-            CompareAndSetOperation operation = new CompareAndSetOperation(name, expect, update);
+            CompareAndSetOperation operation = new CompareAndSetOperation(id.getName(), expect, update);
             Invocation inv = getNodeEngine().getOperationService().createInvocationBuilder(AtomicLongService.SERVICE_NAME, operation, partitionId).build();
             Future f = inv.invoke();
             return (Boolean) f.get();
@@ -64,7 +65,7 @@ public class AtomicLongProxySupport extends AbstractDistributedObject<AtomicLong
 
     public void setInternal(long newValue) {
         try {
-            SetOperation operation = new SetOperation(name, newValue);
+            SetOperation operation = new SetOperation(id.getName(), newValue);
             Invocation inv = getNodeEngine().getOperationService().createInvocationBuilder(AtomicLongService.SERVICE_NAME, operation, partitionId).build();
             inv.invoke();
         } catch (Throwable throwable) {
@@ -74,7 +75,7 @@ public class AtomicLongProxySupport extends AbstractDistributedObject<AtomicLong
 
     public long getAndSetInternal(long newValue) {
         try {
-            GetAndSetOperation operation = new GetAndSetOperation(name, newValue);
+            GetAndSetOperation operation = new GetAndSetOperation(id.getName(), newValue);
             Invocation inv = getNodeEngine().getOperationService().createInvocationBuilder(AtomicLongService.SERVICE_NAME, operation, partitionId).build();
             Future f = inv.invoke();
             return (Long) f.get();
@@ -85,7 +86,7 @@ public class AtomicLongProxySupport extends AbstractDistributedObject<AtomicLong
 
     public long getAndAddInternal(long delta) {
         try {
-            GetAndAddOperation operation = new GetAndAddOperation(name, delta);
+            GetAndAddOperation operation = new GetAndAddOperation(id.getName(), delta);
             Invocation inv = getNodeEngine().getOperationService().createInvocationBuilder(AtomicLongService.SERVICE_NAME, operation, partitionId).build();
             Future f = inv.invoke();
             return (Long) f.get();
@@ -95,12 +96,12 @@ public class AtomicLongProxySupport extends AbstractDistributedObject<AtomicLong
 
     }
 
-    public Object getId() {
-        return name;
+    public Id getId() {
+        return id;
     }
 
     public String getName() {
-        return name;
+        return id.getName();
     }
 
     public int getPartitionId() {

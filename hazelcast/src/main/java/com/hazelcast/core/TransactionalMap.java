@@ -26,7 +26,7 @@ import com.hazelcast.transaction.TransactionalObject;
  * @param <K> key
  * @param <V> value
  */
-public interface TransactionalMap<K, V> extends TransactionalObject, BaseMap<K, V> {
+public interface TransactionalMap<K, V> extends BaseMap<K, V>, TransactionalObject<String> {
 
     /**
      * Transactional implementation of {@link com.hazelcast.core.IMap#containsKey(Object)}.

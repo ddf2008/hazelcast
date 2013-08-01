@@ -16,12 +16,11 @@
 
 package com.hazelcast.map.proxy;
 
-import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.IMap;
 
 /**
  * @author mdogan 11/5/12
  */
-public interface MapProxy<K, V> extends IMap<K, V>, DistributedObject {
+public interface MapProxy<K, V> extends IMap<K, V> {
 
 }

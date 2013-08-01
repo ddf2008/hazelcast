@@ -26,7 +26,7 @@ import java.util.Collection;
  * @param <K>
  * @param <V>
  */
-public interface BaseMultiMap<K, V> extends DistributedObject {
+public interface BaseMultiMap<K, V> extends DistributedObject<String> {
 
     /**
      * Stores a key-value pair in the multimap.

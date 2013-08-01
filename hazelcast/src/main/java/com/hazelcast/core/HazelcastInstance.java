@@ -50,6 +50,8 @@ public interface HazelcastInstance {
      */
     <E> IQueue<E> getQueue(String name);
 
+    <E> IQueue<E> getQueue(Id id);
+
     /**
      * Returns the distributed topic instance with the specified name.
      *
@@ -66,6 +68,8 @@ public interface HazelcastInstance {
      */
     <E> ISet<E> getSet(String name);
 
+    <E> ISet<E> getSet(Id id);
+
     /**
      * Returns the distributed list instance with the specified name.
      * Index based operations on the list are not supported.
@@ -74,6 +78,8 @@ public interface HazelcastInstance {
      * @return distributed list instance with the specified name
      */
     <E> IList<E> getList(String name);
+
+    <E> IList<E> getList(Id id);
 
     /**
      * Returns the distributed map instance with the specified name.
@@ -118,6 +124,8 @@ public interface HazelcastInstance {
      */
     ILock getLock(Object key);
 
+    ILock getLock(Id id);
+
     /**
      * Returns the Cluster that this Hazelcast instance is part of.
      * Cluster interface allows you to add listener for membership
@@ -142,14 +150,6 @@ public interface HazelcastInstance {
      */
     IExecutorService getExecutorService(String name);
 
-    <T> T executeTransaction(TransactionalTask<T> task) throws TransactionException;
-
-    <T> T executeTransaction(TransactionOptions options, TransactionalTask<T> task) throws TransactionException;
-
-    TransactionContext newTransactionContext();
-
-    TransactionContext newTransactionContext(TransactionOptions options);
-
     /**
      * Creates cluster-wide unique IDs. Generated IDs are long type primitive values
      * between <tt>0</tt> and <tt>Long.MAX_VALUE</tt> . Id generation occurs almost at the speed of
@@ -161,6 +161,8 @@ public interface HazelcastInstance {
      */
     IdGenerator getIdGenerator(String name);
 
+    IdGenerator getIdGenerator(Id id);
+
     /**
      * Creates cluster-wide atomic long. Hazelcast IAtomicLong is distributed
      * implementation of <tt>java.util.concurrent.atomic.AtomicLong</tt>.
@@ -169,6 +171,8 @@ public interface HazelcastInstance {
      * @return IAtomicLong proxy for the given name
      */
     IAtomicLong getAtomicLong(String name);
+
+    IAtomicLong getAtomicLong(Id id);
 
     /**
      * Creates cluster-wide CountDownLatch. Hazelcast ICountDownLatch is distributed
@@ -179,6 +183,8 @@ public interface HazelcastInstance {
      */
     ICountDownLatch getCountDownLatch(String name);
 
+    ICountDownLatch getCountDownLatch(Id id);
+
     /**
      * Creates cluster-wide semaphore. Hazelcast ISemaphore is distributed
      * implementation of <tt>java.util.concurrent.Semaphore</tt>.
@@ -188,12 +194,16 @@ public interface HazelcastInstance {
      */
     ISemaphore getSemaphore(String name);
 
-    /**
-     * Returns all {@link DistributedObject}'s such as; queue, map, set, list, topic, lock, multimap.
-     *
-     * @return the collection of instances created by Hazelcast.
-     */
-    Collection<DistributedObject> getDistributedObjects();
+    ISemaphore getSemaphore(Id id);
+
+
+    <T> T executeTransaction(TransactionalTask<T> task) throws TransactionException;
+
+    <T> T executeTransaction(TransactionOptions options, TransactionalTask<T> task) throws TransactionException;
+
+    TransactionContext newTransactionContext();
+
+    TransactionContext newTransactionContext(TransactionOptions options);
 
     /**
      * Adds a Distributed Object listener which will be notified when a
@@ -260,6 +270,14 @@ public interface HazelcastInstance {
     <T extends DistributedObject> T getDistributedObject(String serviceName, Object id);
 
     /**
+     * Returns all {@link DistributedObject}'s such as; queue, map, set, list, topic, lock, multimap.
+     *
+     * @return the collection of instances created by Hazelcast.
+     */
+    Collection<DistributedObject> getDistributedObjects();
+
+    /**
+     *
      * Returns a ConcurrentMap that can be used to add user-context to the HazelcastInstance. This can be used
      * to store dependencies that otherwise are hard to obtain. HazelcastInstance can be
      * obtained by implementing HazelcastInstanceAware interface when submitting a Runnable/Callable to

@@ -21,15 +21,16 @@ import com.hazelcast.collection.CollectionProxyId;
 import com.hazelcast.collection.operations.client.TxnSetAddRequest;
 import com.hazelcast.collection.operations.client.TxnSetRemoveRequest;
 import com.hazelcast.collection.operations.client.TxnSetSizeRequest;
+import com.hazelcast.core.Id;
 import com.hazelcast.core.TransactionalSet;
 
 /**
  * @author ali 6/11/13
  */
-public class ClientTxnSetProxy<E> extends ClientTxnProxy implements TransactionalSet<E> {
+public class ClientTxnSetProxy<E> extends ClientTxnProxy<Id> implements TransactionalSet<E> {
 
     public ClientTxnSetProxy(CollectionProxyId id, TransactionContextProxy proxy) {
-        super(id, proxy);
+        super(new Id(id.getKeyName(), id.getPartitionKey()), proxy);
     }
 
     public boolean add(E e) {
@@ -51,8 +52,7 @@ public class ClientTxnSetProxy<E> extends ClientTxnProxy implements Transactiona
     }
 
     public String getName() {
-        final CollectionProxyId proxyId = (CollectionProxyId)getId();
-        return proxyId.getKeyName();
+        return id.getName();
     }
 
     void onDestroy() {

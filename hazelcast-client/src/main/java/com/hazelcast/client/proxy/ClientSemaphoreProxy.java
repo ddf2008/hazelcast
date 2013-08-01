@@ -19,6 +19,7 @@ package com.hazelcast.client.proxy;
 import com.hazelcast.client.spi.ClientProxy;
 import com.hazelcast.concurrent.semaphore.client.*;
 import com.hazelcast.core.ISemaphore;
+import com.hazelcast.core.Id;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.util.ExceptionUtil;
 
@@ -27,14 +28,14 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author ali 5/23/13
  */
-public class ClientSemaphoreProxy extends ClientProxy implements ISemaphore {
+public class ClientSemaphoreProxy extends ClientProxy<Id> implements ISemaphore {
 
     private final String name;
     private Data key;
 
-    public ClientSemaphoreProxy(String serviceName, String objectId) {
+    public ClientSemaphoreProxy(String serviceName, Id objectId) {
         super(serviceName, objectId);
-        this.name = objectId;
+        this.name = objectId.getName();
     }
 
     public boolean init(int permits) {
@@ -125,7 +126,7 @@ public class ClientSemaphoreProxy extends ClientProxy implements ISemaphore {
 
     public Data getKey() {
         if (key == null){
-            key = getContext().getSerializationService().toData(name);
+            key = getContext().getSerializationService().toData(getId());
         }
         return key;
     }

@@ -30,7 +30,7 @@ import java.util.concurrent.locks.Condition;
 /**
  * @author ali 5/28/13
  */
-public class ClientLockProxy extends ClientProxy implements ILock {
+public class ClientLockProxy extends ClientProxy<Object> implements ILock {
 
     private Data key;
 
@@ -118,12 +118,12 @@ public class ClientLockProxy extends ClientProxy implements ILock {
         return String.valueOf(getId());
     }
 
-    private Data toData(Object o){
+    private Data toData(Object o) {
         return getContext().getSerializationService().toData(o);
     }
 
-    private Data getKeyData(){
-        if (key == null){
+    private Data getKeyData() {
+        if (key == null) {
             key = toData(getId());
         }
         return key;

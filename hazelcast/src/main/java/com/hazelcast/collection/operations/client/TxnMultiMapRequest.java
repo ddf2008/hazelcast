@@ -20,7 +20,6 @@ import com.hazelcast.client.CallableClientRequest;
 import com.hazelcast.client.InitializingRequest;
 import com.hazelcast.collection.CollectionPortableHook;
 import com.hazelcast.collection.CollectionProxyId;
-import com.hazelcast.collection.CollectionProxyType;
 import com.hazelcast.collection.CollectionService;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.nio.serialization.Portable;
@@ -48,7 +47,7 @@ public abstract class TxnMultiMapRequest extends CallableClientRequest implement
     }
 
     public Object getObjectId() {
-        return new CollectionProxyId(name, null, CollectionProxyType.MULTI_MAP);
+        return CollectionProxyId.newMultiMapProxyId(name);
     }
 
     public int getFactoryId() {

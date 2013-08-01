@@ -23,7 +23,7 @@ import java.util.Collection;
  *
  * @param <E> item
  */
-public interface ICollection<E> extends Collection<E>, DistributedObject {
+public interface ICollection<E> extends Collection<E>, DistributedObject<Id> {
     /**
      * Returns the name of this collection
      *

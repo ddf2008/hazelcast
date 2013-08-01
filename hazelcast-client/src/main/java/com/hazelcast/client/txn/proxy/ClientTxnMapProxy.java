@@ -23,7 +23,7 @@ import com.hazelcast.map.client.TxnMapRequest;
 /**
  * @author ali 6/10/13
  */
-public class ClientTxnMapProxy<K,V> extends ClientTxnProxy implements TransactionalMap<K, V> {
+public class ClientTxnMapProxy<K,V> extends ClientTxnProxy<String> implements TransactionalMap<K, V> {
 
     public ClientTxnMapProxy(String name, TransactionContextProxy proxy) {
         super(name, proxy);
@@ -93,7 +93,7 @@ public class ClientTxnMapProxy<K,V> extends ClientTxnProxy implements Transactio
     }
 
     public String getName() {
-        return (String)getId();
+        return getId();
     }
 
     void onDestroy() {

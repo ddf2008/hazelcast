@@ -17,10 +17,7 @@
 package com.hazelcast.instance;
 
 import com.hazelcast.collection.CollectionProxyId;
-import com.hazelcast.collection.CollectionProxyType;
 import com.hazelcast.collection.CollectionService;
-import com.hazelcast.collection.list.ObjectListProxy;
-import com.hazelcast.collection.set.ObjectSetProxy;
 import com.hazelcast.concurrent.atomiclong.AtomicLongService;
 import com.hazelcast.concurrent.countdownlatch.CountDownLatchService;
 import com.hazelcast.concurrent.idgen.IdGeneratorService;
@@ -62,7 +59,7 @@ public final class HazelcastInstanceImpl implements HazelcastInstance {
 
     final ILogger logger;
 
-    final String name;
+    final String instanceName;
 
     final ManagementService managementService;
 
@@ -76,9 +73,9 @@ public final class HazelcastInstanceImpl implements HazelcastInstance {
 
     final ConcurrentMap<String, Object> userContext;
 
-    HazelcastInstanceImpl(String name, Config config, NodeContext nodeContext) throws Exception {
-        this.name = name;
-        this.threadGroup = new ThreadGroup(name);
+    HazelcastInstanceImpl(String instanceName, Config config, NodeContext nodeContext) throws Exception {
+        this.instanceName = instanceName;
+        this.threadGroup = new ThreadGroup(instanceName);
         threadMonitoringService = new ThreadMonitoringService(threadGroup);
         lifecycleService = new LifecycleServiceImpl(this);
         managedContext = new HazelcastManagedContext(this, config.getManagedContext());
@@ -100,52 +97,71 @@ public final class HazelcastInstanceImpl implements HazelcastInstance {
     }
 
     public String getName() {
-        return name;
+        return instanceName;
     }
 
     public <K, V> IMap<K, V> getMap(String name) {
         if (name == null) {
-            throw new NullPointerException("Retrieving a map instance with a null key is not allowed!");
+            throw new NullPointerException("Retrieving a map instance with a null name is not allowed!");
         }
         return getDistributedObject(MapService.SERVICE_NAME, name);
     }
 
     public <E> IQueue<E> getQueue(String name) {
         if (name == null) {
-            throw new NullPointerException("Retrieving a queue instance with a null key is not allowed!");
+            throw new NullPointerException("Retrieving a queue instance with a null name is not allowed!");
         }
-        return getDistributedObject(QueueService.SERVICE_NAME, name);
+        return getQueue(new Id(name));
+    }
+
+    public <E> IQueue<E> getQueue(Id id) {
+        if (id == null) {
+            throw new NullPointerException("Retrieving a queue instance with a null id is not allowed!");
+        }
+        return getDistributedObject(QueueService.SERVICE_NAME, id);
     }
 
     public <E> ITopic<E> getTopic(String name) {
         if (name == null) {
-            throw new NullPointerException("Retrieving a topic instance with a null key is not allowed!");
+            throw new NullPointerException("Retrieving a topic instance with a null name is not allowed!");
         }
         return getDistributedObject(TopicService.SERVICE_NAME, name);
     }
 
     public <E> ISet<E> getSet(String name) {
         if (name == null) {
-            throw new NullPointerException("Retrieving a set instance with a null key is not allowed!");
+            throw new NullPointerException("Retrieving a set instance with a null name is not allowed!");
         }
-        return getDistributedObject(CollectionService.SERVICE_NAME,
-                new CollectionProxyId(ObjectSetProxy.COLLECTION_SET_NAME, name, CollectionProxyType.SET));
+        return getSet(new Id(name));
+    }
+
+    public <E> ISet<E> getSet(Id id) {
+        if (id == null) {
+            throw new NullPointerException("Retrieving a set instance with a null id is not allowed!");
+        }
+        return getDistributedObject(CollectionService.SERVICE_NAME, CollectionProxyId.newSetProxyId(id.getName(), id.getPartitionKey()));
     }
 
     public <E> IList<E> getList(String name) {
         if (name == null) {
-            throw new NullPointerException("Retrieving a list instance with a null key is not allowed!");
+            throw new NullPointerException("Retrieving a list instance with a null name is not allowed!");
         }
-        return getDistributedObject(CollectionService.SERVICE_NAME,
-                new CollectionProxyId(ObjectListProxy.COLLECTION_LIST_NAME, name, CollectionProxyType.LIST));
+        return getList(new Id(name));
+    }
+
+    @Override
+    public <E> IList<E> getList(Id id) {
+        if (id == null) {
+            throw new NullPointerException("Retrieving a list instance with a null id is not allowed!");
+        }
+        return getDistributedObject(CollectionService.SERVICE_NAME, CollectionProxyId.newListProxyId(id.getName(), id.getPartitionKey()));
     }
 
     public <K, V> MultiMap<K, V> getMultiMap(String name) {
         if (name == null) {
-            throw new NullPointerException("Retrieving a multi-map instance with a null key is not allowed!");
+            throw new NullPointerException("Retrieving a multi-map instance with a null name is not allowed!");
         }
-        return getDistributedObject(CollectionService.SERVICE_NAME,
-                new CollectionProxyId(name, null, CollectionProxyType.MULTI_MAP));
+        return getDistributedObject(CollectionService.SERVICE_NAME, CollectionProxyId.newMultiMapProxyId(name));
     }
 
     public ILock getLock(Object key) {
@@ -153,6 +169,13 @@ public final class HazelcastInstanceImpl implements HazelcastInstance {
             throw new NullPointerException("Retrieving a lock instance with a null key is not allowed!");
         }
         return getDistributedObject(LockService.SERVICE_NAME, node.getSerializationService().toData(key));
+    }
+
+    public ILock getLock(Id id) {
+        if (id == null) {
+            throw new NullPointerException("Retrieving a lock instance with a null id is not allowed!");
+        }
+        return getDistributedObject(LockService.SERVICE_NAME, node.getSerializationService().toData(id));
     }
 
     public <T> T executeTransaction(TransactionalTask<T> task) throws TransactionException {
@@ -173,37 +196,65 @@ public final class HazelcastInstanceImpl implements HazelcastInstance {
 
     public IExecutorService getExecutorService(final String name) {
         if (name == null) {
-            throw new NullPointerException("Retrieving an executor instance with a null key is not allowed!");
+            throw new NullPointerException("Retrieving an executor instance with a null name is not allowed!");
         }
         return getDistributedObject(DistributedExecutorService.SERVICE_NAME, name);
     }
 
     public IdGenerator getIdGenerator(final String name) {
         if (name == null) {
-            throw new NullPointerException("Retrieving an id-generator instance with a null key is not allowed!");
+            throw new NullPointerException("Retrieving an id-generator instance with a null name is not allowed!");
         }
-        return getDistributedObject(IdGeneratorService.SERVICE_NAME, name);
+        return getIdGenerator(new Id(name));
+    }
+
+    public IdGenerator getIdGenerator(Id id) {
+        if (id == null) {
+            throw new NullPointerException("Retrieving an id-generator instance with a null id is not allowed!");
+        }
+        return getDistributedObject(IdGeneratorService.SERVICE_NAME, id);
     }
 
     public IAtomicLong getAtomicLong(final String name) {
         if (name == null) {
-            throw new NullPointerException("Retrieving an atomic-long instance with a null key is not allowed!");
+            throw new NullPointerException("Retrieving an atomic-long instance with a null name is not allowed!");
         }
-        return getDistributedObject(AtomicLongService.SERVICE_NAME, name);
+        return getAtomicLong(new Id(name));
+    }
+
+    public IAtomicLong getAtomicLong(Id id) {
+        if (id == null) {
+            throw new NullPointerException("Retrieving an atomic-long instance with a null id is not allowed!");
+        }
+        return getDistributedObject(AtomicLongService.SERVICE_NAME, id);
     }
 
     public ICountDownLatch getCountDownLatch(final String name) {
         if (name == null) {
-            throw new NullPointerException("Retrieving a countdown-latch instance with a null key is not allowed!");
+            throw new NullPointerException("Retrieving a countdown-latch instance with a null name is not allowed!");
         }
-        return getDistributedObject(CountDownLatchService.SERVICE_NAME, name);
+        return getCountDownLatch(new Id(name));
+    }
+
+    public ICountDownLatch getCountDownLatch(Id id) {
+        if (id == null) {
+            throw new NullPointerException("Retrieving a countdown-latch instance with a null id is not allowed!");
+        }
+        return getDistributedObject(CountDownLatchService.SERVICE_NAME, id);
     }
 
     public ISemaphore getSemaphore(final String name) {
         if (name == null) {
-            throw new NullPointerException("Retrieving a semaphore instance with a null key is not allowed!");
+            throw new NullPointerException("Retrieving a semaphore instance with a null name is not allowed!");
         }
-        return getDistributedObject(SemaphoreService.SERVICE_NAME, name);
+        return getSemaphore(new Id(name));
+    }
+
+    public ISemaphore getSemaphore(Id id) {
+        if (id == null) {
+            throw new NullPointerException("Retrieving a semaphore instance with a null id is not allowed!");
+        }
+        return getDistributedObject(SemaphoreService.SERVICE_NAME, id);
     }
 
     public Cluster getCluster() {
@@ -264,7 +315,7 @@ public final class HazelcastInstanceImpl implements HazelcastInstance {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("HazelcastInstance");
-        sb.append("{name='").append(name).append('\'');
+        sb.append("{name='").append(instanceName).append('\'');
         sb.append(", node=").append(node.getThisAddress());
         sb.append('}');
         return sb.toString();

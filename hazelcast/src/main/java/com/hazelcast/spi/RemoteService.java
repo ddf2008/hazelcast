@@ -21,9 +21,9 @@ import com.hazelcast.core.DistributedObject;
 /**
  * @author mdogan 10/31/12
  */
-public interface RemoteService {
+public interface RemoteService<T> {
 
-    DistributedObject createDistributedObject(Object objectId);
+    DistributedObject createDistributedObject(T objectId);
 
-    void destroyDistributedObject(Object objectId);
+    void destroyDistributedObject(T objectId);
 }

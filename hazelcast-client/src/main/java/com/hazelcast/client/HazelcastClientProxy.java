@@ -174,4 +174,44 @@ public final class HazelcastClientProxy implements HazelcastInstance {
         }
         return c;
     }
+
+    @Override
+    public <E> IQueue<E> getQueue(Id id) {
+        return getClient().getQueue(id);
+    }
+
+    @Override
+    public <E> ISet<E> getSet(Id id) {
+        return getClient().getSet(id);
+    }
+
+    @Override
+    public <E> IList<E> getList(Id id) {
+        return getClient().getList(id);
+    }
+
+    @Override
+    public ILock getLock(Id id) {
+        return getClient().getLock(id);
+    }
+
+    @Override
+    public IdGenerator getIdGenerator(Id id) {
+        return getClient().getIdGenerator(id);
+    }
+
+    @Override
+    public IAtomicLong getAtomicLong(Id id) {
+        return getClient().getAtomicLong(id);
+    }
+
+    @Override
+    public ICountDownLatch getCountDownLatch(Id id) {
+        return getClient().getCountDownLatch(id);
+    }
+
+    @Override
+    public ISemaphore getSemaphore(Id id) {
+        return getClient().getSemaphore(id);
+    }
 }

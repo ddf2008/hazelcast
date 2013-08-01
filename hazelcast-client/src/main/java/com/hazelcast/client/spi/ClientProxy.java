@@ -26,17 +26,17 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author mdogan 5/16/13
  */
-public abstract class ClientProxy implements DistributedObject {
+public abstract class ClientProxy<ID> implements DistributedObject<ID> {
 
     private final String serviceName;
 
-    private final Object objectId;
+    private final ID objectId;
 
     private volatile ClientContext context;
 
     private final Map<String, ListenerSupport> listenerSupportMap = new ConcurrentHashMap<String, ListenerSupport>();
 
-    protected ClientProxy(String serviceName, Object objectId) {
+    protected ClientProxy(String serviceName, ID objectId) {
         this.serviceName = serviceName;
         this.objectId = objectId;
     }
@@ -73,7 +73,7 @@ public abstract class ClientProxy implements DistributedObject {
         this.context = context;
     }
 
-    public final Object getId() {
+    public final ID getId() {
         return objectId;
     }
 

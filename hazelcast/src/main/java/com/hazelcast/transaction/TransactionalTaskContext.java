@@ -38,6 +38,9 @@ public interface TransactionalTaskContext {
      */
     <E> TransactionalQueue<E> getQueue(String name);
 
+
+    <E> TransactionalQueue<E> getQueue(Id id);
+
     /**
      * Returns the transactional multimap instance with the specified name.
      *
@@ -56,6 +59,9 @@ public interface TransactionalTaskContext {
      */
     <E> TransactionalList<E> getList(String name);
 
+
+    <E> TransactionalList<E> getList(Id id);
+
     /**
      * Returns the transactional set instance with the specified name.
      *
@@ -64,6 +70,9 @@ public interface TransactionalTaskContext {
      * @return transactional set instance with the specified name
      */
     <E> TransactionalSet<E> getSet(String name);
+
+
+    <E> TransactionalSet<E> getSet(Id id);
 
 
     <T extends TransactionalObject> T getTransactionalObject(String serviceName, Object id);

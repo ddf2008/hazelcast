@@ -21,7 +21,7 @@ import com.hazelcast.transaction.TransactionalObject;
 /**
  * Transactional implementation of {@link IList}.
  */
-public interface TransactionalList<E> extends TransactionalObject {
+public interface TransactionalList<E> extends TransactionalObject<Id> {
 
     /**
      * Add new item to transactional list

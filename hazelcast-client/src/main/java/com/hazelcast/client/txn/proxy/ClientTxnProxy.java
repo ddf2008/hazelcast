@@ -27,12 +27,12 @@ import java.io.IOException;
 /**
  * @author ali 6/10/13
  */
-abstract class ClientTxnProxy {
+abstract class ClientTxnProxy<ID> {
 
-    final Object id;
+    final ID id;
     final TransactionContextProxy proxy;
 
-    ClientTxnProxy(Object id, TransactionContextProxy proxy) {
+    ClientTxnProxy(ID id, TransactionContextProxy proxy) {
         this.id = id;
         this.proxy = proxy;
     }
@@ -42,9 +42,8 @@ abstract class ClientTxnProxy {
         try {
             return clusterService.sendAndReceiveFixedConnection(proxy.getConnection(), request);
         } catch (IOException e) {
-            ExceptionUtil.rethrow(new HazelcastException(e));
+            throw ExceptionUtil.rethrow(new HazelcastException(e));
         }
-        return null;
     }
 
     abstract void onDestroy();
@@ -53,7 +52,7 @@ abstract class ClientTxnProxy {
         onDestroy();
     }
 
-    public Object getId() {
+    public ID getId() {
         return id;
     }
 

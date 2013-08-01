@@ -17,6 +17,7 @@
 package com.hazelcast.client.txn.proxy;
 
 import com.hazelcast.client.txn.TransactionContextProxy;
+import com.hazelcast.core.Id;
 import com.hazelcast.core.TransactionalQueue;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.queue.client.TxnOfferRequest;
@@ -28,10 +29,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author ali 6/7/13
  */
-public class ClientTxnQueueProxy<E> extends ClientTxnProxy implements TransactionalQueue<E>{
+public class ClientTxnQueueProxy<E> extends ClientTxnProxy<Id> implements TransactionalQueue<E>{
 
-    public ClientTxnQueueProxy(String name, TransactionContextProxy proxy) {
-        super(name, proxy);
+    public ClientTxnQueueProxy(Id id, TransactionContextProxy proxy) {
+        super(id, proxy);
     }
 
     public boolean offer(E e) {
@@ -69,7 +70,7 @@ public class ClientTxnQueueProxy<E> extends ClientTxnProxy implements Transactio
     }
 
     public String getName() {
-        return (String)getId();
+        return id.getName();
     }
 
     void onDestroy() {

@@ -18,6 +18,7 @@ package com.hazelcast.queue.client;
 
 import com.hazelcast.client.CallableClientRequest;
 import com.hazelcast.client.RetryableRequest;
+import com.hazelcast.core.Id;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
@@ -42,7 +43,7 @@ public class QueueDestroyRequest extends CallableClientRequest implements Portab
 
     public Object call() throws Exception {
         final QueueService service = getService();
-        service.destroyDistributedObject(name);
+        service.destroyDistributedObject(new Id(name));
         return null;
     }
 

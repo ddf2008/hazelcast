@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author ali 1/2/13
  */
-public class ObjectMultiMapProxy<K, V> extends MultiMapProxySupport implements CollectionProxy, MultiMap<K, V> {
+public class ObjectMultiMapProxy<K, V> extends MultiMapProxySupport<String> implements CollectionProxy, MultiMap<K, V> {
 
     public ObjectMultiMapProxy(CollectionService service, NodeEngine nodeEngine, CollectionProxyId proxyId) {
         super(service, nodeEngine, nodeEngine.getConfig().getMultiMapConfig(proxyId.getName()), proxyId);
@@ -237,5 +237,10 @@ public class ObjectMultiMapProxy<K, V> extends MultiMapProxySupport implements C
             keySet.add((K) nodeEngine.toObject(dataKey));
         }
         return keySet;
+    }
+
+    @Override
+    public String getId() {
+        return proxyId.getName();
     }
 }

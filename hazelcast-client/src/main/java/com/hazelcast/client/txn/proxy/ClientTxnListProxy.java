@@ -21,15 +21,16 @@ import com.hazelcast.collection.CollectionProxyId;
 import com.hazelcast.collection.operations.client.TxnListAddRequest;
 import com.hazelcast.collection.operations.client.TxnListRemoveRequest;
 import com.hazelcast.collection.operations.client.TxnListSizeRequest;
+import com.hazelcast.core.Id;
 import com.hazelcast.core.TransactionalList;
 
 /**
  * @author ali 6/11/13
  */
-public class ClientTxnListProxy<E> extends ClientTxnProxy implements TransactionalList<E> {
+public class ClientTxnListProxy<E> extends ClientTxnProxy<Id> implements TransactionalList<E> {
 
     public ClientTxnListProxy(CollectionProxyId id, TransactionContextProxy proxy) {
-        super(id, proxy);
+        super(new Id(id.getKeyName(), id.getPartitionKey()), proxy);
     }
 
     public boolean add(E e) {
@@ -51,8 +52,7 @@ public class ClientTxnListProxy<E> extends ClientTxnProxy implements Transaction
     }
 
     public String getName() {
-        final CollectionProxyId proxyId = (CollectionProxyId)getId();
-        return proxyId.getKeyName();
+        return id.getName();
     }
 
     void onDestroy() {

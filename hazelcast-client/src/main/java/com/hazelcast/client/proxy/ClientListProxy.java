@@ -20,10 +20,7 @@ import com.hazelcast.client.spi.ClientProxy;
 import com.hazelcast.client.spi.EventHandler;
 import com.hazelcast.collection.CollectionProxyId;
 import com.hazelcast.collection.operations.client.*;
-import com.hazelcast.core.IList;
-import com.hazelcast.core.ItemEvent;
-import com.hazelcast.core.ItemListener;
-import com.hazelcast.core.Member;
+import com.hazelcast.core.*;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.nio.serialization.SerializationService;
 import com.hazelcast.spi.impl.PortableCollection;
@@ -36,14 +33,13 @@ import java.util.*;
 /**
  * @author ali 5/20/13
  */
-public class ClientListProxy<E> extends ClientProxy implements IList<E> {
+public class ClientListProxy<E> extends ClientProxy<Id> implements IList<E> {
 
     final CollectionProxyId proxyId;
-
-    Data key;
+    private Data key;
 
     public ClientListProxy(String serviceName, CollectionProxyId objectId) {
-        super(serviceName, objectId);
+        super(serviceName, new Id(objectId.getKeyName(), objectId.getPartitionKey()));
         proxyId = objectId;
     }
 
@@ -227,7 +223,7 @@ public class ClientListProxy<E> extends ClientProxy implements IList<E> {
 
     private Data getKey(){
         if (key == null){
-            key = getSerializationService().toData(proxyId.getKeyName());
+            key = getSerializationService().toData(getId());
         }
         return key;
     }

@@ -17,10 +17,7 @@
 package com.hazelcast.transaction.impl;
 
 import com.hazelcast.collection.CollectionProxyId;
-import com.hazelcast.collection.CollectionProxyType;
 import com.hazelcast.collection.CollectionService;
-import com.hazelcast.collection.list.ObjectListProxy;
-import com.hazelcast.collection.set.ObjectSetProxy;
 import com.hazelcast.core.*;
 import com.hazelcast.map.MapService;
 import com.hazelcast.queue.QueueService;
@@ -67,31 +64,73 @@ final class TransactionContextImpl implements TransactionContext {
 
     @SuppressWarnings("unchecked")
     public <K, V> TransactionalMap<K, V> getMap(String name) {
+        if (name == null) {
+            throw new NullPointerException("Retrieving a map instance with a null name is not allowed!");
+        }
         return (TransactionalMap<K, V>) getTransactionalObject(MapService.SERVICE_NAME, name);
     }
 
-    @SuppressWarnings("unchecked")
     public <E> TransactionalQueue<E> getQueue(String name) {
-        return (TransactionalQueue<E>) getTransactionalObject(QueueService.SERVICE_NAME, name);
+        if (name == null) {
+            throw new NullPointerException("Retrieving a queue instance with a null name is not allowed!");
+        }
+        return getQueue(new Id(name));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <E> TransactionalQueue<E> getQueue(Id id) {
+        if (id == null) {
+            throw new NullPointerException("Retrieving a queue instance with a null id is not allowed!");
+        }
+        return (TransactionalQueue<E>) getTransactionalObject(QueueService.SERVICE_NAME, id);
     }
 
     @SuppressWarnings("unchecked")
     public <K, V> TransactionalMultiMap<K, V> getMultiMap(String name) {
-        return (TransactionalMultiMap<K, V>) getTransactionalObject(CollectionService.SERVICE_NAME, new CollectionProxyId(name, null, CollectionProxyType.MULTI_MAP));
+        if (name == null) {
+            throw new NullPointerException("Retrieving a multi-map instance with a null name is not allowed!");
+        }
+        return (TransactionalMultiMap<K, V>) getTransactionalObject(CollectionService.SERVICE_NAME, CollectionProxyId.newMultiMapProxyId(name));
     }
 
-    @SuppressWarnings("unchecked")
     public <E> TransactionalList<E> getList(String name) {
-        return (TransactionalList<E>) getTransactionalObject(CollectionService.SERVICE_NAME, new CollectionProxyId(ObjectListProxy.COLLECTION_LIST_NAME, name, CollectionProxyType.LIST));
+        if (name == null) {
+            throw new NullPointerException("Retrieving a list instance with a null name is not allowed!");
+        }
+        return getList(new Id(name));
     }
 
     @SuppressWarnings("unchecked")
+    public <E> TransactionalList<E> getList(Id id) {
+        if (id == null) {
+            throw new NullPointerException("Retrieving a list instance with a null id is not allowed!");
+        }
+        return (TransactionalList<E>) getTransactionalObject(CollectionService.SERVICE_NAME, CollectionProxyId.newListProxyId(id.getName(), id.getPartitionKey()));
+    }
+
     public <E> TransactionalSet<E> getSet(String name) {
-        return (TransactionalSet<E>) getTransactionalObject(CollectionService.SERVICE_NAME, new CollectionProxyId(ObjectSetProxy.COLLECTION_SET_NAME, name, CollectionProxyType.SET));
+        if (name == null) {
+            throw new NullPointerException("Retrieving a set instance with a null name is not allowed!");
+        }
+        return getSet(new Id(name));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <E> TransactionalSet<E> getSet(Id id) {
+        if (id == null) {
+            throw new NullPointerException("Retrieving a set instance with a null id is not allowed!");
+        }
+        return (TransactionalSet<E>) getTransactionalObject(CollectionService.SERVICE_NAME, CollectionProxyId.newSetProxyId(id.getName(), id.getPartitionKey()));
     }
 
     @SuppressWarnings("unchecked")
     public TransactionalObject getTransactionalObject(String serviceName, Object id) {
+        if (serviceName == null) {
+            throw new NullPointerException("Retrieving a transactional object with a null service name is not allowed!");
+        }
+        if (id == null) {
+            throw new NullPointerException("Retrieving a transactional object with a null id is not allowed!");
+        }
         if (transaction.getState() != Transaction.State.ACTIVE) {
             throw new TransactionNotActiveException("No transaction is found while accessing " +
                     "transactional object -> " + serviceName + "[" + id + "]!");

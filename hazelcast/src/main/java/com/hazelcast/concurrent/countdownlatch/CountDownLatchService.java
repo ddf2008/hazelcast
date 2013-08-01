@@ -16,6 +16,7 @@
 
 package com.hazelcast.concurrent.countdownlatch;
 
+import com.hazelcast.core.Id;
 import com.hazelcast.partition.MigrationEndpoint;
 import com.hazelcast.spi.*;
 
@@ -26,7 +27,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * @author mdogan 1/10/13
  */
-public class CountDownLatchService implements ManagedService, RemoteService, MigrationAwareService {
+public class CountDownLatchService implements ManagedService, RemoteService<Id>, MigrationAwareService {
 
     public final static String SERVICE_NAME = "hz:impl:countDownLatchService";
 
@@ -91,12 +92,12 @@ public class CountDownLatchService implements ManagedService, RemoteService, Mig
         latches.clear();
     }
 
-    public CountDownLatchProxy createDistributedObject(Object objectId) {
-        return new CountDownLatchProxy(String.valueOf(objectId), nodeEngine);
+    public CountDownLatchProxy createDistributedObject(Id objectId) {
+        return new CountDownLatchProxy(objectId, nodeEngine);
     }
 
-    public void destroyDistributedObject(Object objectId) {
-        latches.remove(String.valueOf(objectId));
+    public void destroyDistributedObject(Id objectId) {
+        latches.remove(objectId.getName());
     }
 
     public void beforeMigration(PartitionMigrationEvent partitionMigrationEvent) {

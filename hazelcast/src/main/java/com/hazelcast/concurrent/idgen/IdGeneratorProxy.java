@@ -17,6 +17,7 @@
 package com.hazelcast.concurrent.idgen;
 
 import com.hazelcast.core.IAtomicLong;
+import com.hazelcast.core.Id;
 import com.hazelcast.core.IdGenerator;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,7 +30,7 @@ public class IdGeneratorProxy implements IdGenerator {
 
     private static final int BLOCK_SIZE = 10000;
 
-    final String name;
+    final Id id;
 
     final IAtomicLong atomicLong;
 
@@ -37,8 +38,8 @@ public class IdGeneratorProxy implements IdGenerator {
 
     AtomicLong local;
 
-    public IdGeneratorProxy(IAtomicLong atomicLong, String name) {
-        this.name = name;
+    public IdGeneratorProxy(IAtomicLong atomicLong, Id id) {
+        this.id = id;
         this.atomicLong = atomicLong;
         residue = new AtomicInteger(BLOCK_SIZE);
         local = new AtomicLong(-1);
@@ -76,12 +77,12 @@ public class IdGeneratorProxy implements IdGenerator {
         return local.get() * BLOCK_SIZE + value;
     }
 
-    public Object getId() {
-        return name;
+    public Id getId() {
+        return id;
     }
 
     public String getName() {
-        return name;
+        return id.getName();
     }
 
     public void destroy() {

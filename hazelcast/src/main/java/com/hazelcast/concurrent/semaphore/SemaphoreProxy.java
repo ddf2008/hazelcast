@@ -17,6 +17,7 @@
 package com.hazelcast.concurrent.semaphore;
 
 import com.hazelcast.core.ISemaphore;
+import com.hazelcast.core.Id;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.Invocation;
 import com.hazelcast.spi.NodeEngine;
@@ -29,26 +30,26 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author ali 1/22/13
  */
-public class SemaphoreProxy extends AbstractDistributedObject<SemaphoreService> implements ISemaphore {
+public class SemaphoreProxy extends AbstractDistributedObject<Id, SemaphoreService> implements ISemaphore {
 
-    final String name;
+    final Id id;
 
     final int partitionId;
 
-    public SemaphoreProxy(String name, SemaphoreService service, NodeEngine nodeEngine) {
+    public SemaphoreProxy(Id id, SemaphoreService service, NodeEngine nodeEngine) {
         super(nodeEngine, service);
-        this.name = name;
-        this.partitionId = nodeEngine.getPartitionService().getPartitionId(nodeEngine.toData(name));
+        this.id = id;
+        this.partitionId = nodeEngine.getPartitionService().getPartitionId(id);
     }
 
     public String getName() {
-        return name;
+        return id.getName();
     }
 
     public boolean init(int permits) {
         checkNegative(permits);
         try {
-            return (Boolean) invoke(new InitOperation(name, permits));
+            return (Boolean) invoke(new InitOperation(id.getName(), permits));
         } catch (Throwable t) {
             throw ExceptionUtil.rethrow(t);
         }
@@ -61,7 +62,7 @@ public class SemaphoreProxy extends AbstractDistributedObject<SemaphoreService> 
     public void acquire(int permits) throws InterruptedException {
         checkNegative(permits);
         try {
-            invoke(new AcquireOperation(name, permits, -1));
+            invoke(new AcquireOperation(id.getName(), permits, -1));
         } catch (Throwable t) {
             throw ExceptionUtil.rethrowAllowInterrupted(t);
         }
@@ -69,7 +70,7 @@ public class SemaphoreProxy extends AbstractDistributedObject<SemaphoreService> 
 
     public int availablePermits() {
         try {
-            return (Integer) invoke(new AvailableOperation(name));
+            return (Integer) invoke(new AvailableOperation(id.getName()));
         } catch (Throwable t) {
             throw ExceptionUtil.rethrow(t);
         }
@@ -77,7 +78,7 @@ public class SemaphoreProxy extends AbstractDistributedObject<SemaphoreService> 
 
     public int drainPermits() {
         try {
-            return (Integer) invoke(new DrainOperation(name));
+            return (Integer) invoke(new DrainOperation(id.getName()));
         } catch (Throwable t) {
             throw ExceptionUtil.rethrow(t);
         }
@@ -86,7 +87,7 @@ public class SemaphoreProxy extends AbstractDistributedObject<SemaphoreService> 
     public void reducePermits(int reduction) {
         checkNegative(reduction);
         try {
-            invoke(new ReduceOperation(name, reduction));
+            invoke(new ReduceOperation(id.getName(), reduction));
         } catch (Throwable t) {
             throw ExceptionUtil.rethrow(t);
         }
@@ -99,7 +100,7 @@ public class SemaphoreProxy extends AbstractDistributedObject<SemaphoreService> 
     public void release(int permits) {
         checkNegative(permits);
         try {
-            invoke(new ReleaseOperation(name, permits));
+            invoke(new ReleaseOperation(id.getName(), permits));
         } catch (Throwable t) {
             throw ExceptionUtil.rethrow(t);
         }
@@ -128,14 +129,14 @@ public class SemaphoreProxy extends AbstractDistributedObject<SemaphoreService> 
     public boolean tryAcquire(int permits, long timeout, TimeUnit unit) throws InterruptedException {
         checkNegative(permits);
         try {
-            return (Boolean) invoke(new AcquireOperation(name, permits, unit.toMillis(timeout)));
+            return (Boolean) invoke(new AcquireOperation(id.getName(), permits, unit.toMillis(timeout)));
         } catch (Throwable t) {
             throw ExceptionUtil.rethrowAllowInterrupted(t);
         }
     }
 
-    public Object getId() {
-        return name;
+    public Id getId() {
+        return id;
     }
 
     private <T> T invoke(SemaphoreOperation operation) throws ExecutionException, InterruptedException {

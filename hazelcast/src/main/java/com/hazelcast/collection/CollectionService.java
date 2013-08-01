@@ -48,7 +48,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * @author ali 1/1/13
  */
-public class CollectionService implements ManagedService, RemoteService,
+public class CollectionService implements ManagedService, RemoteService<CollectionProxyId>,
         MigrationAwareService, EventPublishingService<CollectionEvent, EventListener>, TransactionalService {
 
     public static final String SERVICE_NAME = "hz:impl:collectionService";
@@ -125,9 +125,8 @@ public class CollectionService implements ManagedService, RemoteService,
         return proxy.createNew();
     }
 
-    public DistributedObject createDistributedObject(Object objectId) {
-        CollectionProxyId collectionProxyId = (CollectionProxyId) objectId;
-        final CollectionProxyType type = collectionProxyId.type;
+    public DistributedObject createDistributedObject(CollectionProxyId collectionProxyId) {
+        final CollectionProxyType type = collectionProxyId.getType();
         switch (type) {
             case MULTI_MAP:
                 return new ObjectMultiMapProxy(this, nodeEngine, collectionProxyId);
@@ -141,8 +140,7 @@ public class CollectionService implements ManagedService, RemoteService,
         throw new IllegalArgumentException();
     }
 
-    public void destroyDistributedObject(Object objectId) {
-        CollectionProxyId collectionProxyId = (CollectionProxyId) objectId;
+    public void destroyDistributedObject(CollectionProxyId collectionProxyId) {
         for (CollectionPartitionContainer container : partitionContainers) {
             if (container != null) {
                 container.destroyCollection(collectionProxyId);
@@ -333,7 +331,7 @@ public class CollectionService implements ManagedService, RemoteService,
 
     public <T extends TransactionalObject> T createTransactionalObject(Object id, TransactionSupport transaction) {
         CollectionProxyId collectionProxyId = (CollectionProxyId) id;
-        final CollectionProxyType type = collectionProxyId.type;
+        final CollectionProxyType type = collectionProxyId.getType();
         switch (type) {
             case MULTI_MAP:
                 return (T) new TransactionalMultiMapProxy(nodeEngine, this, collectionProxyId, transaction);

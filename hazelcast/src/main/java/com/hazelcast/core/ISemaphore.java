@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 
-public interface ISemaphore extends DistributedObject {
+public interface ISemaphore extends DistributedObject<Id> {
     /**
      * Returns the name of this ISemaphore instance.
      *

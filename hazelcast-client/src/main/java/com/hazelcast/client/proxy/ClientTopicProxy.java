@@ -33,7 +33,7 @@ import com.hazelcast.util.ExceptionUtil;
 /**
  * @author ali 5/24/13
  */
-public class ClientTopicProxy<E> extends ClientProxy implements ITopic<E> {
+public class ClientTopicProxy<E> extends ClientProxy<String> implements ITopic<E> {
 
     private final String name;
     private Data key;

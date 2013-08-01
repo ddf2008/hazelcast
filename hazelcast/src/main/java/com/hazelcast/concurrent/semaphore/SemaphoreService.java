@@ -17,6 +17,7 @@
 package com.hazelcast.concurrent.semaphore;
 
 import com.hazelcast.config.SemaphoreConfig;
+import com.hazelcast.core.Id;
 import com.hazelcast.partition.MigrationEndpoint;
 import com.hazelcast.partition.PartitionView;
 import com.hazelcast.spi.*;
@@ -35,7 +36,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author ali 1/21/13
  */
 public class SemaphoreService implements ManagedService, MigrationAwareService, MembershipAwareService,
-        RemoteService, ClientAwareService {
+        RemoteService<Id>, ClientAwareService {
 
     public static final String SERVICE_NAME = "hz:impl:semaphoreService";
 
@@ -91,12 +92,12 @@ public class SemaphoreService implements ManagedService, MigrationAwareService, 
         }
     }
 
-    public SemaphoreProxy createDistributedObject(Object objectId) {
-        return new SemaphoreProxy((String)objectId, this, nodeEngine);
+    public SemaphoreProxy createDistributedObject(Id objectId) {
+        return new SemaphoreProxy(objectId, this, nodeEngine);
     }
 
-    public void destroyDistributedObject(Object objectId) {
-        permitMap.remove(String.valueOf(objectId));
+    public void destroyDistributedObject(Id objectId) {
+        permitMap.remove(objectId.getName());
     }
 
     public void beforeMigration(PartitionMigrationEvent partitionMigrationEvent) {
