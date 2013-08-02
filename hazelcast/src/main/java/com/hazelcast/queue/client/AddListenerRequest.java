@@ -20,6 +20,7 @@ import com.hazelcast.client.CallableClientRequest;
 import com.hazelcast.client.ClientEndpoint;
 import com.hazelcast.client.ClientEngine;
 import com.hazelcast.client.InitializingRequest;
+import com.hazelcast.core.Id;
 import com.hazelcast.core.ItemEvent;
 import com.hazelcast.core.ItemListener;
 import com.hazelcast.nio.serialization.Data;
@@ -53,7 +54,7 @@ public class AddListenerRequest extends CallableClientRequest implements Portabl
     }
 
     public Object getObjectId() {
-        return name;
+        return new Id(name);
     }
 
     public int getFactoryId() {

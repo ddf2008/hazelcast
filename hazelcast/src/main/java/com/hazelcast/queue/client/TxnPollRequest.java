@@ -3,6 +3,7 @@ package com.hazelcast.queue.client;
 import com.hazelcast.client.CallableClientRequest;
 import com.hazelcast.client.ClientEndpoint;
 import com.hazelcast.client.InitializingRequest;
+import com.hazelcast.core.Id;
 import com.hazelcast.core.TransactionalQueue;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
@@ -50,7 +51,7 @@ public class TxnPollRequest extends CallableClientRequest implements Portable, I
     }
 
     public Object getObjectId() {
-        return name;
+        return new Id(name);
     }
 
     public void writePortable(PortableWriter writer) throws IOException {

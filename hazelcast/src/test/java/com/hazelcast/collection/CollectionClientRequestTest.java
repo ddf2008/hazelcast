@@ -22,6 +22,7 @@ import com.hazelcast.client.SimpleClient;
 import com.hazelcast.collection.operations.client.*;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.IList;
+import com.hazelcast.core.Id;
 import com.hazelcast.core.MultiMap;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.nio.serialization.SerializationService;
@@ -48,9 +49,9 @@ public class CollectionClientRequestTest extends ClientTestSupport {
 
     static final String name = "test";
     static final CollectionProxyId mmProxyId = CollectionProxyId.newMultiMapProxyId(name);
-    static final CollectionProxyId listProxyId = CollectionProxyId.newListProxyId(name, null);
+    static final CollectionProxyId listProxyId = CollectionProxyId.newListProxyId(name, name);
     static final SerializationService ss = new SerializationServiceBuilder().build();
-    static final Data dataKey = ss.toData(name);
+    static final Data dataKey = ss.toData(new Id(name));
 
     protected Config createConfig() {
         return new Config();

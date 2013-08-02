@@ -47,7 +47,7 @@ import java.util.concurrent.ConcurrentMap;
  * Date: 11/14/12
  * Time: 12:21 AM
  */
-public class QueueService implements ManagedService, MigrationAwareService, TransactionalService,
+public class QueueService implements ManagedService, MigrationAwareService, TransactionalService<Id>,
         RemoteService<Id>, EventPublishingService<QueueEvent, ItemListener> {
 
     public static final String SERVICE_NAME = "hz:impl:queueService";
@@ -207,7 +207,7 @@ public class QueueService implements ManagedService, MigrationAwareService, Tran
         return ConcurrencyUtil.getOrPutIfAbsent(statsMap, name, localQueueStatsConstructorFunction);
     }
 
-    public TransactionalQueueProxy createTransactionalObject(Object id, TransactionSupport transaction) {
-        return new TransactionalQueueProxy(nodeEngine, this, String.valueOf(id), transaction);
+    public TransactionalQueueProxy createTransactionalObject(Id id, TransactionSupport transaction) {
+        return new TransactionalQueueProxy(nodeEngine, this, id, transaction);
     }
 }

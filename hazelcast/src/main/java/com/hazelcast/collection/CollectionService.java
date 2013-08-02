@@ -49,7 +49,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author ali 1/1/13
  */
 public class CollectionService implements ManagedService, RemoteService<CollectionProxyId>,
-        MigrationAwareService, EventPublishingService<CollectionEvent, EventListener>, TransactionalService {
+        MigrationAwareService, EventPublishingService<CollectionEvent, EventListener>, TransactionalService<CollectionProxyId> {
 
     public static final String SERVICE_NAME = "hz:impl:collectionService";
     private final NodeEngine nodeEngine;
@@ -329,16 +329,15 @@ public class CollectionService implements ManagedService, RemoteService<Collecti
         return ConcurrencyUtil.getOrPutIfAbsent(statsMap, name, localMultiMapStatsConstructorFunction);
     }
 
-    public <T extends TransactionalObject> T createTransactionalObject(Object id, TransactionSupport transaction) {
-        CollectionProxyId collectionProxyId = (CollectionProxyId) id;
-        final CollectionProxyType type = collectionProxyId.getType();
+    public <T extends TransactionalObject> T createTransactionalObject(CollectionProxyId id, TransactionSupport transaction) {
+        final CollectionProxyType type = id.getType();
         switch (type) {
             case MULTI_MAP:
-                return (T) new TransactionalMultiMapProxy(nodeEngine, this, collectionProxyId, transaction);
+                return (T) new TransactionalMultiMapProxy(nodeEngine, this, id, transaction);
             case LIST:
-                return (T) new TransactionalListProxy(nodeEngine, this, collectionProxyId, transaction);
+                return (T) new TransactionalListProxy(nodeEngine, this, id, transaction);
             case SET:
-                return (T) new TransactionalSetProxy(nodeEngine, this, collectionProxyId, transaction);
+                return (T) new TransactionalSetProxy(nodeEngine, this, id, transaction);
             case QUEUE:
                 return null;
         }

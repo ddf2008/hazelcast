@@ -18,6 +18,7 @@ package com.hazelcast.queue.client;
 
 import com.hazelcast.client.InitializingRequest;
 import com.hazelcast.client.PartitionClientRequest;
+import com.hazelcast.core.Id;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
@@ -60,7 +61,7 @@ public abstract class QueueRequest extends PartitionClientRequest implements Por
     }
 
     public Object getObjectId() {
-        return name;
+        return new Id(name);
     }
 
     public int getFactoryId() {

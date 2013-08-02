@@ -19,8 +19,8 @@ package com.hazelcast.spi;
 import com.hazelcast.transaction.TransactionalObject;
 import com.hazelcast.transaction.impl.TransactionSupport;
 
-public interface TransactionalService {
+public interface TransactionalService<ID> {
 
-    <T extends TransactionalObject> T createTransactionalObject(Object id, TransactionSupport transaction);
+    <T extends TransactionalObject> T createTransactionalObject(ID id, TransactionSupport transaction);
 
 }

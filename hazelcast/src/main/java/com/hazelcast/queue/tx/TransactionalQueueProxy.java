@@ -16,12 +16,11 @@
 
 package com.hazelcast.queue.tx;
 
+import com.hazelcast.core.Id;
 import com.hazelcast.core.TransactionalQueue;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.queue.QueueService;
 import com.hazelcast.spi.NodeEngine;
-import com.hazelcast.transaction.TransactionNotActiveException;
-import com.hazelcast.transaction.impl.Transaction;
 import com.hazelcast.transaction.impl.TransactionSupport;
 
 import java.util.concurrent.TimeUnit;
@@ -31,8 +30,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class TransactionalQueueProxy<E> extends TransactionalQueueProxySupport implements TransactionalQueue<E> {
 
-    public TransactionalQueueProxy(NodeEngine nodeEngine, QueueService service, String name, TransactionSupport tx) {
-        super(nodeEngine, service, name, tx);
+    public TransactionalQueueProxy(NodeEngine nodeEngine, QueueService service, Id id, TransactionSupport tx) {
+        super(nodeEngine, service, id, tx);
     }
 
     public boolean offer(E e) {
